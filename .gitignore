@@ -1,0 +1,5 @@
+# Don't track these files
+*.pb.h
+*.pb.cc
+*.pb.o
+*.o
