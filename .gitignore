@@ -4,3 +4,4 @@
 *.pb.o
 *.o
 backendStore
+.DS_Store

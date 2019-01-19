@@ -1,9 +1,9 @@
-#include "KeyValueStoreServiceImpl.h"
+#include "key_value_store_service_impl.h"
 
 grpc::Status KeyValueStoreServiceImpl::put(grpc::ServerContext* context, const chirp::PutRequest* request, chirp::PutReply* reply) override {
   // TODO: put whatever the request says
   return grpc::Status::OK;
-} 
+}
 
 grpc::Status KeyValueStoreServiceImpl::get(grpc::ServerContext* context, const chirp::GetRequest* request, chirp::GetReply* reply) {
   // TODO: get whatever the request wants and set it as value in reply
