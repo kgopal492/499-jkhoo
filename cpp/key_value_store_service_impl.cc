@@ -1,6 +1,6 @@
 #include "key_value_store_service_impl.h"
 
-grpc::Status KeyValueStoreServiceImpl::put(grpc::ServerContext* context, const chirp::PutRequest* request, chirp::PutReply* reply) override {
+grpc::Status KeyValueStoreServiceImpl::put(grpc::ServerContext* context, const chirp::PutRequest* request, chirp::PutReply* reply) {
   // TODO: put whatever the request says
   return grpc::Status::OK;
 }
@@ -10,7 +10,7 @@ grpc::Status KeyValueStoreServiceImpl::get(grpc::ServerContext* context, const c
   return grpc::Status::OK;
 }
 
-grpc::Status KeyValueStoreServiceImpl::deletekey(grpc::ServerContext* context, const chirp::DeleteRequest* request, chirp::DeleteReply* reply) override {
+grpc::Status KeyValueStoreServiceImpl::deletekey(grpc::ServerContext* context, const chirp::DeleteRequest* request, chirp::DeleteReply* reply) {
   // TODO: delete what the request wants
   return grpc::Status::OK;
 }
