@@ -14,5 +14,5 @@ class KeyValueStoreServiceImpl final : public chirp::KeyValueStore::Service {
 
  private:
   // Map to store the keys and values of the KeyValueStoreServiceImpl
-  std::map<std::string, std::list<std::string> > store_;
+  std::map<std::string, std::list<std::string>> store_;
 };

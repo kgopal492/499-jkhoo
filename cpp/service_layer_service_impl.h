@@ -5,6 +5,7 @@
 #include "service.grpc.pb.h"
 
 // Class for logic and data behind the ServiceLayer
+// The methods in this class are the implementation of the Service Layer Service from service.proto
 class ServiceLayerServiceImpl final : public chirp::ServiceLayer::Service {
  public:
   grpc::Status registeruser(grpc::ServerContext* context, const chirp::RegisterRequest* request, chirp::RegisterReply* reply) override;
@@ -12,13 +13,14 @@ class ServiceLayerServiceImpl final : public chirp::ServiceLayer::Service {
   grpc::Status follow(grpc::ServerContext* context, const chirp::FollowRequest* request, chirp::FollowReply* reply) override;
   grpc::Status read(grpc::ServerContext* context, const chirp::ReadRequest* request, chirp::ReadReply* reply) override;
   grpc::Status monitor(grpc::ServerContext* context, const chirp::MonitorRequest* request, chirp::MonitorReply* reply);
+  enum ActionEnum {
+    kUserChirps = 0,
+    kUserFollowing = 1,
+    kChirpText = 2,
+    kChirpReplies = 3,
+  };
 
  private:
-  enum ActionEnum {
-    kuser_chirps = 0,
-    kuser_following = 1,
-    kchirp_text = 2,
-    kchirp_replies = 3,
-  };
+  // curr_id_ keeps track of what the id of the next chirp should be
   int curr_id_ = 0;
 };
