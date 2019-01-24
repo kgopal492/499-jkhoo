@@ -4,7 +4,8 @@
 #include "../cpp/backendStore.grpc.pb.h"
 #include "../cpp/backendStore.pb.h"
 
-TEST(PutTest, ReceiveOkStatus){
+// adds two values to the KeyValueStore under the same key
+TEST(PutTest, SameKeyTest){
   KeyValueStore test_store;
   test_store.put("1testkey", "1testvalue");
   test_store.put("1testkey", "2testvalue");
