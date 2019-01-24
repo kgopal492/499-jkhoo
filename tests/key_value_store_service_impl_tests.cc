@@ -9,9 +9,7 @@ TEST(PutTest, ReceiveOkStatus){
   request.set_key("1testvalue");
 
   chirp::PutReply reply;
-
   grpc::ServerContext context;
-
   KeyValueStoreServiceImpl sample;
   grpc::Status status = sample.put(&context, &request, &reply);
 
