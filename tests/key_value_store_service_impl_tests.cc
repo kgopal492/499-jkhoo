@@ -5,15 +5,9 @@
 #include "../cpp/backendStore.pb.h"
 
 TEST(PutTest, ReceiveOkStatus){
-  chirp::PutRequest request;
-  request.set_key("1testkey");
-  request.set_key("1testvalue");
-  chirp::PutReply reply;
-  grpc::ServerContext context;
-  KeyValueStoreServiceImpl sample;
-
-  grpc::Status status = sample.put(&context, &request, &reply);
-  ASSERT_EQ(status.ok(), true);
+  KeyValueStore test_store;
+  test_store.put("1testkey", "1testvalue");
+  test_store.put("1testkey", "2testvalue");
 }
 
 int main(int argc, char **argv) {
