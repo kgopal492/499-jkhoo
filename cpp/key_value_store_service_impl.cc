@@ -1,7 +1,8 @@
 #include "key_value_store_service_impl.h"
 
+
 grpc::Status KeyValueStoreServiceImpl::put(grpc::ServerContext* context, const chirp::PutRequest* request, chirp::PutReply* reply) {
-  // TODO: put whatever the request says
+  value_store_.put(request->key(), request->value());
   return grpc::Status::OK;
 }
 
