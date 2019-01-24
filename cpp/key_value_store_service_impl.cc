@@ -2,7 +2,6 @@
 
 
 grpc::Status KeyValueStoreServiceImpl::put(grpc::ServerContext* context, const chirp::PutRequest* request, chirp::PutReply* reply) {
-  // TODO: put whatever the request says
   std::lock_guard<std::mutex> lock(store_mut_);
   if (store_.find(request->key()) == store_.end()) {
     std::list<std::string> initialElement;
