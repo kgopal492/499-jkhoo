@@ -1,7 +1,7 @@
+#include <gtest/gtest.h>
 #include "../cpp/key_value_store_service_impl.h"
 #include "../cpp/backendStore.grpc.pb.h"
 #include "../cpp/backendStore.pb.h"
-#include <gtest/gtest.h>
 
 TEST(PutTest, ReceiveOkStatus){
   chirp::PutRequest request;
@@ -12,8 +12,8 @@ TEST(PutTest, ReceiveOkStatus){
 
   grpc::ServerContext context;
 
-  KeyValueStoreServiceImpl* sample = new KeyValueStoreServiceImpl();
-  grpc::Status status = sample->put(&context, &request, &reply);
+  KeyValueStoreServiceImpl sample;
+  grpc::Status status = sample.put(&context, &request, &reply);
 
   ASSERT_EQ(status.ok(), true);
 }
