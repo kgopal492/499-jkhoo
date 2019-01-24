@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include "../cpp/key_value_store_service_impl.h"
 #include "../cpp/backendStore.grpc.pb.h"
 #include "../cpp/backendStore.pb.h"
