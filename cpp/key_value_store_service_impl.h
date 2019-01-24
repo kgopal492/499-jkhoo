@@ -1,6 +1,7 @@
 #include <map>
 #include <list>
 #include <string>
+#include <mutex>
 
 #include <grpcpp/grpcpp.h>
 #include "backendStore.grpc.pb.h"
@@ -15,4 +16,5 @@ class KeyValueStoreServiceImpl final : public chirp::KeyValueStore::Service {
  private:
   // Map to store the keys and values of the KeyValueStoreServiceImpl
   std::map<std::string, std::list<std::string>> store_;
+  std::mutex store_mut_;
 };
