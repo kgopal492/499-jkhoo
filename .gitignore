@@ -4,5 +4,6 @@
 *.pb.o
 *.o
 backendStore
+backend_store
 service_layer
 .DS_Store
