@@ -9,6 +9,8 @@ TEST(PutTest, SameKeyTest){
   KeyValueStore test_store;
   test_store.put("1testkey", "1testvalue");
   test_store.put("1testkey", "2testvalue");
+  // TODO: Once get functionality is done:
+  // Get "1testkey" and assert that the first element is "1testvalue" and the second element is "2testvalue"
 }
 
 int main(int argc, char **argv) {
