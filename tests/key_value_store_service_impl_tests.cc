@@ -4,13 +4,24 @@
 #include "../cpp/backendStore.grpc.pb.h"
 #include "../cpp/backendStore.pb.h"
 
+// adds a value to the KeyValueStore
+TEST(PutGetTest, Simple) {
+  KeyValueStore test_store;
+  test_store.put("1testkey", "1testvalue");
+  ASSERT_EQ("1testvalue4ba37ad81cc870aa40fb7bd9615a1b8a", test_store.get("1testkey"));
+}
 // adds two values to the KeyValueStore under the same key
-TEST(PutTest, SameKeyTest){
+TEST(PutGetTest, SameKeyTest) {
   KeyValueStore test_store;
   test_store.put("1testkey", "1testvalue");
   test_store.put("1testkey", "2testvalue");
-  // TODO: Once get functionality is done:
-  // Get "1testkey" and assert that the first element is "1testvalue" and the second element is "2testvalue"
+  ASSERT_EQ("1testvalue4ba37ad81cc870aa40fb7bd9615a1b8a2testvalue4ba37ad81cc870aa40fb7bd9615a1b8a", test_store.get("1testkey"));
+}
+// gets a key without a value 
+TEST(GetTest, NoValue) {
+  KeyValueStore test_store;
+  std::string value = test_store.get("empty_key");
+  ASSERT_EQ(value, "");
 }
 
 int main(int argc, char **argv) {
