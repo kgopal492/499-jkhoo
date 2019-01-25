@@ -18,6 +18,6 @@ class KeyValueStore final {
   std::map<std::string, std::deque<std::string>> store_;
   // Protects store_
   std::mutex store_mut_;
-
+  // separates values in `get()` return string
   const std::string delim = "4ba37ad81cc870aa40fb7bd9615a1b8a";
 };
