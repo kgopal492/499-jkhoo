@@ -7,13 +7,12 @@ grpc::Status KeyValueStoreServiceImpl::put(grpc::ServerContext* context, const c
 }
 
 grpc::Status KeyValueStoreServiceImpl::get(grpc::ServerContext* context, const chirp::GetRequest* request, chirp::GetReply* reply) {
-  // TODO: get whatever the request wants and set it as value in reply
   std::string value = value_store_.get(request->key());
   reply->set_value(value);
   return grpc::Status::OK;
 }
 
 grpc::Status KeyValueStoreServiceImpl::deletekey(grpc::ServerContext* context, const chirp::DeleteRequest* request, chirp::DeleteReply* reply) {
-  // TODO: delete what the request wants
+  value_store_.deletekey(request->key());
   return grpc::Status::OK;
 }
