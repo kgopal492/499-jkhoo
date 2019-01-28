@@ -10,7 +10,7 @@
 class KeyValueStore final {
  public:
   void put(const std::string& key, const std::string& value);
-  std::string get(const std::string& key);
+  const std::deque<std::string>* get(const std::string& key);
   void deletekey(const std::string& key);
 
  private:
