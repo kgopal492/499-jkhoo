@@ -8,30 +8,42 @@
 TEST(PutGetTest, Simple) {
   KeyValueStore test_store;
   test_store.put("1testkey", "1testvalue");
+  
   const std::deque<std::string>* values = test_store.get("1testkey");
   ASSERT_EQ("1testvalue", values->at(0));
+  ASSERT_EQ(1, values->size());
 }
 // adds two values to the KeyValueStore under the same key
 TEST(PutGetTest, SameKeyTest) {
   KeyValueStore test_store;
   test_store.put("1testkey", "1testvalue");
   test_store.put("1testkey", "2testvalue");
-  //ASSERT_EQ("1testvalue4ba37ad81cc870aa40fb7bd9615a1b8a2testvalue4ba37ad81cc870aa40fb7bd9615a1b8a", test_store.get("1testkey"));
+
+  const std::deque<std::string>* values = test_store.get("1testkey");
+  ASSERT_EQ("1testvalue", values->at(0));
+  ASSERT_EQ("2testvalue", values->at(1));
+  ASSERT_EQ(2, values->size());
 }
 // gets a key without a value
 TEST(GetTest, NoValue) {
   KeyValueStore test_store;
-  //std::string value = test_store.get("empty_key");
-  //ASSERT_EQ("", value);
+
+  const std::deque<std::string>* values = test_store.get("empty_key");
+  ASSERT_EQ(0, values->size());
 }
 
 // adds a value to the KeyValueStore and deletes a key with one value
 TEST(PutGetDeleteTest, SingleValue) {
   KeyValueStore test_store;
   test_store.put("1testkey", "1testvalue");
-  //ASSERT_EQ("1testvalue4ba37ad81cc870aa40fb7bd9615a1b8a", test_store.get("1testkey"));
+
+  const std::deque<std::string>* values = test_store.get("1testkey");
+  ASSERT_EQ("1testvalue", values->at(0));
+  ASSERT_EQ(1, values->size());
+
   test_store.deletekey("1testkey");
-  //ASSERT_EQ("", test_store.get("1testkey"));
+  values = test_store.get("1testkey");
+  ASSERT_EQ(0, values->size());
 }
 
 // adds two values to the KeyValueStore under the same key and deletes the key
@@ -39,9 +51,15 @@ TEST(PutGetDeleteTest, MultiValue){
   KeyValueStore test_store;
   test_store.put("1testkey", "1testvalue");
   test_store.put("1testkey", "2testvalue");
-  //ASSERT_EQ("1testvalue4ba37ad81cc870aa40fb7bd9615a1b8a2testvalue4ba37ad81cc870aa40fb7bd9615a1b8a", test_store.get("1testkey"));
+
+  const std::deque<std::string>* values = test_store.get("1testkey");
+  ASSERT_EQ("1testvalue", values->at(0));
+  ASSERT_EQ("2testvalue", values->at(1));
+  ASSERT_EQ(2, values->size());
+
   test_store.deletekey("1testkey");
-  //ASSERT_EQ("", test_store.get("1testkey"));
+  values = test_store.get("1testkey");
+  ASSERT_EQ(0, values->size());
 }
 
 

@@ -12,7 +12,9 @@ grpc::Status KeyValueStoreServiceImpl::get(grpc::ServerContext* context, const c
   for(std::string val: *values){
     returnVals.add_values(val);
   }
-  reply->set_value(returnVals);
+  std::string finalVal;
+  returnVals.SerializeToString(&finalVal);
+  reply->set_value(finalVal);
   return grpc::Status::OK;
 }
 
