@@ -6,14 +6,12 @@ void KeyValueStore::put(const std::string& key, const std::string& value) {
   store_[key].push_back(value);
 }
 
-const std::deque<std::string>* KeyValueStore::get(const std::string& key) {
+const std::deque<std::string>& KeyValueStore::get(const std::string& key) {
   std::lock_guard<std::mutex> lock(store_mut_);
-  const std::deque<std::string>* values = &store_[key];
+  const std::deque<std::string>& values = store_[key];
   return values;
 }
 
 void KeyValueStore::deletekey(const std::string& key) {
-  if (store_.count(key)) {
-    store_.erase(key);
-  }
+  store_.erase(key);
 }

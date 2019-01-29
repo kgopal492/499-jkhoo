@@ -7,9 +7,9 @@ grpc::Status KeyValueStoreServiceImpl::put(grpc::ServerContext* context, const c
 }
 
 grpc::Status KeyValueStoreServiceImpl::get(grpc::ServerContext* context, const chirp::GetRequest* request, chirp::GetReply* reply) {
-  const std::deque<std::string>* values = value_store_.get(request->key());
+  const std::deque<std::string>& values = value_store_.get(request->key());
   chirp::StoreValues returnVals;
-  for(std::string val: *values){
+  for(const std::string& val: values){
     returnVals.add_values(val);
   }
   std::string finalVal;
