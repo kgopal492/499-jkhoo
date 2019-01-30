@@ -1,9 +1,29 @@
 #include "service.h"
 
 void ServiceLayer::registeruser(const std::string& username) {
-  // TODO: register the user in the key value store
-  // PutRequest with key = ActionEnum.kUserChirps + username with value = null
-  // PutRequest with key = ActionEnum.kUserFollowing + username with value = null
+  if(!debug_mode_){
+    chirp::PutRequest request1;
+    const std::string& user_key = "0"+username;
+    const std::string& empty = "";
+    request1.set_key(user_key);
+    request1.set_value(empty);
+    chirp::PutReply reply;
+    grpc::ClientContext context;
+    grpc::Status status = stub_->put(&context, request1, &reply);
+
+    chirp::PutRequest request2;
+    const std::string& following_user_key = "1"+username;
+    request2.set_key(following_user_key);
+    request2.set_value(empty);
+    status = stub_->put(&context, request2, &reply);
+  }
+  else{
+    const std::string& chirp_key = "0" + username;
+    debug_store_.put(chirp_key, "");
+
+    const std::string& chirp_key_following = "1" + username;
+    debug_store_.put(chirp_key_following, "");
+  }
 }
 
 chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string& text, const std::string& parent_id) {
