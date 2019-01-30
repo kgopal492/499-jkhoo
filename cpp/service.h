@@ -9,15 +9,6 @@
 // The methods in this class are the implementation of the Service Layer Service from service.proto
 class ServiceLayer final {
  public:
-  // Enum with what to prepend keys with for adding values into the KeyValueStore
-  // To keep track of where different data is stored.
-  enum ActionEnum {
-    kUserChirps = '0',
-    kUserFollowing = '1',
-    kChirpText = '2',
-    kChirpReplies = '3',
-  };
-
   // Communicates with KeyValueStoreServiceImpl to register username
   void registeruser(const std::string& username);
   // Communicates with KeyValueStoreServiceImpl to add a chirp
@@ -32,8 +23,12 @@ class ServiceLayer final {
  private:
   // keeps track of the id of the next chirp
   int curr_id_ = 0;
+  // models connection to an endpoint
   std::shared_ptr<grpc::Channel> channel_ = grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials());
+  // stub to communicate with KeyValueStore
   std::unique_ptr<chirp::KeyValueStore::Stub> stub_ = chirp::KeyValueStore::NewStub(channel_);
+  // determines whether to communicate over GRPC or just with the key value store
   bool debug_mode_ = true;
+  // store for debugging mode
   KeyValueStore debug_store_;
 };
