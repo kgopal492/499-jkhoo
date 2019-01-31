@@ -23,8 +23,8 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string&
   return placeholder;
 }
 void ServiceLayer::follow(const std::string& username, const std::string& to_follow) {
-  // TODO: add to_follow to username's people following
-  // PutRequest with key = ActionEnum.kUserFollowing + username with value = to_follow
+  const std::string& following_user_key = "1"+username;
+  store_->put(following_user_key, to_follow);
 }
 
 chirp::Chirp ServiceLayer::read(const std::string& chirp_id) {

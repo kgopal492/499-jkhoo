@@ -15,8 +15,7 @@ grpc::Status ServiceLayerServiceImpl::chirp(grpc::ServerContext* context, const 
   return grpc::Status::OK;
 }
 grpc::Status ServiceLayerServiceImpl::follow(grpc::ServerContext* context, const chirp::FollowRequest* request, chirp::FollowReply* reply) {
-  // TODO: add to_follow to username's people following
-  // PutRequest with key = ActionEnum.kUserFollowing + username with value = to_follow
+  service_.follow(request->username(), request->to_follow());
   return grpc::Status::OK;
 }
 
