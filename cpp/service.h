@@ -9,6 +9,7 @@
 // The methods in this class are the implementation of the Service Layer Service from service.proto
 class ServiceLayer final {
  public:
+  ServiceLayer(KeyValueClientInterface* key_value_connection);
   // Communicates with KeyValueStoreServiceImpl to register username
   void registeruser(const std::string& username);
   // Communicates with KeyValueStoreServiceImpl to add a chirp
@@ -23,12 +24,6 @@ class ServiceLayer final {
  private:
   // keeps track of the id of the next chirp
   int curr_id_ = 0;
-  // models connection to an endpoint
-  std::shared_ptr<grpc::Channel> channel_ = grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials());
-  // stub to communicate with KeyValueStore
-  std::unique_ptr<chirp::KeyValueStore::Stub> stub_ = chirp::KeyValueStore::NewStub(channel_);
-  // determines whether to communicate over GRPC or just with the key value store
-  bool debug_mode_ = true;
-  // store for debugging mode
-  KeyValueStore debug_store_;
+  // connection to the KeyValueStore
+  KeyValueClientInterface* store_;
 };

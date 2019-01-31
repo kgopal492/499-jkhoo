@@ -1,29 +1,15 @@
 #include "service.h"
 
+ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection) {
+  store_ = key_value_connection;
+}
 void ServiceLayer::registeruser(const std::string& username) {
-  if(!debug_mode_){
-    chirp::PutRequest request1;
-    const std::string& user_key = "0"+username;
-    const std::string& empty = "";
-    request1.set_key(user_key);
-    request1.set_value(empty);
-    chirp::PutReply reply;
-    grpc::ClientContext context;
-    grpc::Status status = stub_->put(&context, request1, &reply);
+  const std::string& user_key = "0"+username;
+  const std::string& empty = "";
+  store_->put(user_key, empty);
 
-    chirp::PutRequest request2;
-    const std::string& following_user_key = "1"+username;
-    request2.set_key(following_user_key);
-    request2.set_value(empty);
-    status = stub_->put(&context, request2, &reply);
-  }
-  else{
-    const std::string& chirp_key = "0" + username;
-    debug_store_.put(chirp_key, "");
-
-    const std::string& chirp_key_following = "1" + username;
-    debug_store_.put(chirp_key_following, "");
-  }
+  const std::string& following_user_key = "1"+username;
+  store_->put(following_user_key, empty);
 }
 
 chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string& text, const std::string& parent_id) {
