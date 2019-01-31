@@ -1,9 +1,7 @@
 #include "service_layer_service_impl.h"
 
 grpc::Status ServiceLayerServiceImpl::registeruser(grpc::ServerContext* context, const chirp::RegisterRequest* request, chirp::RegisterReply* reply) {
-  // TODO: register the user in the key value store
-  // PutRequest with key = ActionEnum.kUserChirps + username with value = null
-  // PutRequest with key = ActionEnum.kUserFollowing + username with value = null
+  service_.registeruser(request->username());
   return grpc::Status::OK;
 }
 
