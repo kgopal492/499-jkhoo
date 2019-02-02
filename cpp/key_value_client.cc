@@ -15,13 +15,19 @@ const std::deque<std::string>& KeyValueClient::get(const std::string& key) {
   request.set_key(key);
   chirp::GetReply reply;
   grpc::ClientContext context;
-  // TODO: For some odd reason the next line does not work, figure out why later
-  grpc::Status status = stub_->get(&context, &request, &reply);
-  // TODO: actuall get values and put into deque
-  std::deque<std::string> placeholder;
-  placeholder.push_back("fake info");
-  const std::deque<std::string>& placeholderReturnValue = placeholder;
-  return placeholderReturnValue;
+
+  std::unique_ptr<grpc::ClientReaderWriter<chirp::GetRequest, chirp::GetReply> > stream_handle = stub_->get(&context);
+  stream_handle->Write(request);
+  stream_handle->Read(&reply);
+  std::deque<std::string> returnValues;
+  chirp::StoreValues returnVals;
+  returnVals.ParseFromString(reply.value());
+
+  for(const std::string& val: returnVals.values()){
+    returnValues.push_back(val);
+  }
+  const std::deque<std::string>& returnDeque = returnValues;
+  return returnDeque;
 }
 
 void KeyValueClient::deletekey(const std::string& key) {
