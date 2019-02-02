@@ -8,7 +8,7 @@
 // data structure behind the KeyValueStoreServiceImpl
 class KeyValueClient : public KeyValueClientInterface {
  public:
-  ~KeyValueClient(){};
+  virtual ~KeyValueClient(){};
   // puts key value pair in store_, appending value if there is already a value associated with key
   void put(const std::string& key, const std::string& value);
   // gets values associated with the key

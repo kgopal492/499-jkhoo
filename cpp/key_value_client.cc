@@ -16,7 +16,7 @@ const std::deque<std::string>& KeyValueClient::get(const std::string& key) {
   chirp::GetReply reply;
   grpc::ClientContext context;
   // TODO: For some odd reason the next line does not work, figure out why later
-  //grpc::Status status = stub_->get(&context, &request, &reply);
+  grpc::Status status = stub_->get(&context, &request, &reply);
   // TODO: actuall get values and put into deque
   std::deque<std::string> placeholder;
   placeholder.push_back("fake info");
