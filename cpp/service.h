@@ -3,20 +3,13 @@
 
 #include <grpcpp/grpcpp.h>
 #include "service.grpc.pb.h"
+#include "key_value_store.h"
 
 // Class for logic and data behind the ServiceLayer
 // The methods in this class are the implementation of the Service Layer Service from service.proto
 class ServiceLayer final {
  public:
-  // Enum with what to prepend keys with for adding values into the KeyValueStore
-  // To keep track of where different data is stored.
-  enum ActionEnum {
-    kUserChirps = 0,
-    kUserFollowing = 1,
-    kChirpText = 2,
-    kChirpReplies = 3,
-  };
-
+  ServiceLayer(KeyValueClientInterface* key_value_connection);
   // Communicates with KeyValueStoreServiceImpl to register username
   void registeruser(const std::string& username);
   // Communicates with KeyValueStoreServiceImpl to add a chirp
@@ -31,4 +24,6 @@ class ServiceLayer final {
  private:
   // keeps track of the id of the next chirp
   int curr_id_ = 0;
+  // connection to the KeyValueStore
+  KeyValueClientInterface* store_;
 };

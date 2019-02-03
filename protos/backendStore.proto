@@ -2,10 +2,6 @@ syntax = "proto3";
 
 package chirp;
 
-message StoreValues {
-  repeated bytes values = 1;
-}
-
 message PutRequest {
   bytes key = 1;
   bytes value = 2;

@@ -1,9 +1,15 @@
 #include "service.h"
 
+ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection) {
+  store_ = key_value_connection;
+}
 void ServiceLayer::registeruser(const std::string& username) {
-  // TODO: register the user in the key value store
-  // PutRequest with key = ActionEnum.kUserChirps + username with value = null
-  // PutRequest with key = ActionEnum.kUserFollowing + username with value = null
+  const std::string& user_key = "0"+username;
+  const std::string& empty = "";
+  store_->put(user_key, empty);
+
+  const std::string& following_user_key = "1"+username;
+  store_->put(following_user_key, empty);
 }
 
 chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string& text, const std::string& parent_id) {
@@ -17,8 +23,8 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string&
   return placeholder;
 }
 void ServiceLayer::follow(const std::string& username, const std::string& to_follow) {
-  // TODO: add to_follow to username's people following
-  // PutRequest with key = ActionEnum.kUserFollowing + username with value = to_follow
+  const std::string& following_user_key = "1"+username;
+  store_->put(following_user_key, to_follow);
 }
 
 chirp::Chirp ServiceLayer::read(const std::string& chirp_id) {

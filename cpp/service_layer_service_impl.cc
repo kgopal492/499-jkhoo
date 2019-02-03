@@ -1,9 +1,7 @@
 #include "service_layer_service_impl.h"
 
 grpc::Status ServiceLayerServiceImpl::registeruser(grpc::ServerContext* context, const chirp::RegisterRequest* request, chirp::RegisterReply* reply) {
-  // TODO: register the user in the key value store
-  // PutRequest with key = ActionEnum.kUserChirps + username with value = null
-  // PutRequest with key = ActionEnum.kUserFollowing + username with value = null
+  service_.registeruser(request->username());
   return grpc::Status::OK;
 }
 
@@ -17,8 +15,7 @@ grpc::Status ServiceLayerServiceImpl::chirp(grpc::ServerContext* context, const 
   return grpc::Status::OK;
 }
 grpc::Status ServiceLayerServiceImpl::follow(grpc::ServerContext* context, const chirp::FollowRequest* request, chirp::FollowReply* reply) {
-  // TODO: add to_follow to username's people following
-  // PutRequest with key = ActionEnum.kUserFollowing + username with value = to_follow
+  service_.follow(request->username(), request->to_follow());
   return grpc::Status::OK;
 }
 

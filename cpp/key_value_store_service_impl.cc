@@ -6,15 +6,18 @@ grpc::Status KeyValueStoreServiceImpl::put(grpc::ServerContext* context, const c
   return grpc::Status::OK;
 }
 
-grpc::Status KeyValueStoreServiceImpl::get(grpc::ServerContext* context, const chirp::GetRequest* request, chirp::GetReply* reply) {
-  const std::deque<std::string>& values = value_store_.get(request->key());
-  chirp::StoreValues returnVals;
-  for(const std::string& val: values){
-    returnVals.add_values(val);
+grpc::Status KeyValueStoreServiceImpl::get(grpc::ServerContext* context, grpc::ServerReaderWriter<chirp::GetReply, chirp::GetRequest>* stream) {
+  chirp::GetRequest request;
+  stream->Read(&request);
+  const std::deque<std::string>& values = value_store_.get(request.key());
+
+  chirp::GetReply reply;
+  for(const std::string& val : values){
+    reply.set_value(val);
+    const chirp::GetReply& sendingReply = reply;
+    stream->Write(sendingReply);
   }
-  std::string finalVal;
-  returnVals.SerializeToString(&finalVal);
-  reply->set_value(finalVal);
+  
   return grpc::Status::OK;
 }
 
