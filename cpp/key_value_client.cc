@@ -16,16 +16,14 @@ const std::deque<std::string>& KeyValueClient::get(const std::string& key) {
   chirp::GetReply reply;
   grpc::ClientContext context;
 
-  std::unique_ptr<grpc::ClientReaderWriter<chirp::GetRequest, chirp::GetReply> > stream_handle = stub_->get(&context);
+  std::unique_ptr<grpc::ClientReaderWriter<chirp::GetRequest, chirp::GetReply> > stream_handle (stub_->get(&context));
   stream_handle->Write(request);
-  stream_handle->Read(&reply);
-  std::deque<std::string> returnValues;
-  chirp::StoreValues returnVals;
-  returnVals.ParseFromString(reply.value());
 
-  for(const std::string& val: returnVals.values()){
-    returnValues.push_back(val);
+  std::deque<std::string> returnValues;
+  while(stream_handle->Read(&reply)){
+    returnValues.push_back(reply.value());
   }
+
   const std::deque<std::string>& returnDeque = returnValues;
   return returnDeque;
 }
