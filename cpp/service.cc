@@ -13,26 +13,66 @@ void ServiceLayer::registeruser(const std::string& username) {
 }
 
 chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string& text, const std::string& parent_id) {
-  // TODO: put the chirp into the key value store
-  // get curr_id_ to determine what the ID will be of this chirp
-  // PutRequest with key = ActionEnum.kChirpText + curr_id_ with value = list with text of chirp
-  // PutRequest with key = ActionEnum.kChirpReplies + curr_id with value = null
-  // add curr_id_ to key = ActionEnum.kUserChirps + username by doing a PutRequest
-  // increment curr_id_
-  chirp::Chirp placeholder;
-  return placeholder;
+  const std::string& my_id = std::to_string(curr_id_);
+  curr_id_ = curr_id_ + 1;
+  chirp::Chirp this_chirp;
+  this_chirp.set_username(username);
+  this_chirp.set_text(text);
+  this_chirp.set_id(my_id);
+  this_chirp.set_parent_id(parent_id);
+  chirp::Timestamp* chirp_timestamp = new chirp::Timestamp();
+  chirp_timestamp->set_seconds(time(NULL));
+  this_chirp.set_allocated_timestamp(chirp_timestamp);
+
+  const std::string& this_chirp_key = "2" + my_id;
+  std::string chirp_as_string;
+  this_chirp.SerializeToString(&chirp_as_string);
+  const std::string& value = chirp_as_string;
+  store_->put(this_chirp_key, value);
+
+  const std::string& user_key = "0"+username;
+  store_->put(user_key, my_id);
+
+  const std::string& this_chirp_reply_key = "3"+my_id;
+  const std::string& empty = "";
+  store_->put(this_chirp_reply_key, empty);
+
+  if(parent_id.length() > 0){
+    const std::string& chirp_parent_id = "3"+parent_id;
+    const std::string& this_chirp_id = my_id;
+    store_->put(chirp_parent_id, my_id);
+  }
+  return this_chirp;
 }
 void ServiceLayer::follow(const std::string& username, const std::string& to_follow) {
   const std::string& following_user_key = "1"+username;
   store_->put(following_user_key, to_follow);
 }
 
-chirp::Chirp ServiceLayer::read(const std::string& chirp_id) {
-  // TODO: read chirp thread from given ID
-  // GetRequest for text of given ID with key = ActionEnum.kChirpText + chirpId
-  // recursively get replies with key = ActionEnum.kChirpReplies + chirpID and text for this thread until no more replies exist
-  chirp::Chirp placeholder;
-  return placeholder;
+std::deque<chirp::Chirp> ServiceLayer::read(const std::string& chirp_id) {
+  std::deque<chirp::Chirp> read_chirps;
+  std::deque<std::string> chirp_list;
+  std::string given_chirp = chirp_id;
+  chirp_list.push_back(given_chirp);
+  while(chirp_list.size() > 0){
+    const std::string& curr_chirp_id = chirp_list.at(0);
+    chirp_list.pop_front();
+    if(curr_chirp_id.length() > 0){
+      chirp::Chirp thisChirp;
+      const std::string& this_chirp_key = "2"+curr_chirp_id;
+      const std::deque<std::string>& this_chirps_values = store_->get(this_chirp_key);
+      thisChirp.ParseFromString(this_chirps_values.at(0));
+      read_chirps.push_back(thisChirp);
+
+      const std::string& this_chirp_reply_key = "3"+curr_chirp_id;
+      const std::deque<std::string>& this_chirp_replies = store_->get(this_chirp_reply_key);
+      for(std::string reply : this_chirp_replies){
+        chirp_list.push_back(reply);
+      }
+    }
+  }
+
+  return read_chirps;
 }
 
 chirp::Chirp ServiceLayer::monitor(const std::string& username) {
