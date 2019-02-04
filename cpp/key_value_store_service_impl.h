@@ -1,5 +1,5 @@
-#ifndef ADD_H
-#define ADD_H
+#ifndef KVSSI_H
+#define KVSSI_H
 #include <map>
 #include <deque>
 #include <string>
