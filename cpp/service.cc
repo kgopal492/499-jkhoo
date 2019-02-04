@@ -4,12 +4,12 @@ ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection) {
   store_ = key_value_connection;
 }
 void ServiceLayer::registeruser(const std::string& username) {
-  const std::string& user_key = kuserChirps_+username;
+  const std::string& userKey = kuserChirps_+username;
   const std::string& empty = "";
-  store_->put(user_key, empty);
+  store_->put(userKey, empty);
 
-  const std::string& following_user_key = kuserFollowing_+username;
-  store_->put(following_user_key, empty);
+  const std::string& followingUserKey = kuserFollowing_+username;
+  store_->put(followingUserKey, empty);
 }
 
 chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string& text, const std::string& parent_id) {
