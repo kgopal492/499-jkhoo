@@ -1,3 +1,5 @@
+#ifndef KVSSI_H
+#define KVSSI_H
 #include <map>
 #include <deque>
 #include <string>
@@ -18,3 +20,4 @@ class KeyValueStoreServiceImpl final : public chirp::KeyValueStore::Service {
   // Data structure behind the key value store
   KeyValueStore value_store_;
 };
+#endif
