@@ -21,7 +21,10 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string&
   this_chirp.set_id(my_id);
   this_chirp.set_parent_id(parent_id);
   chirp::Timestamp* chirp_timestamp = new chirp::Timestamp();
-  chirp_timestamp->set_seconds(time(NULL));
+  int64_t seconds = google::protobuf::util::TimeUtil::TimestampToSeconds(google::protobuf::util::TimeUtil::GetEpoch());
+  int64_t useconds = google::protobuf::util::TimeUtil::TimestampToMicroseconds(google::protobuf::util::TimeUtil::GetEpoch());
+  chirp_timestamp->set_seconds(seconds);
+  chirp_timestamp->set_useconds(useconds);
   this_chirp.set_allocated_timestamp(chirp_timestamp);
 
   const std::string& this_chirp_key = kchirpValue_ + my_id;
@@ -81,10 +84,21 @@ std::deque<chirp::Chirp> ServiceLayer::read(const std::string& chirp_id) {
   return read_chirps;
 }
 
-chirp::Chirp ServiceLayer::monitor(const std::string& username) {
-  // TODO: stream chirps from following users
-  // GetRequest for key = ActionEnum.kUserFollowing + username to get who is being followed
-  // stream chirps
-  chirp::Chirp placeholder;
-  return placeholder;
+std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username, chirp::Timestamp start) {
+  std::deque<chirp::Chirp> found_chirps;
+  const std::string& user_following_key = kuserFollowing_ + username;
+  const std::deque<std::string>& user_following = store_->get(user_following_key);
+  for(std::string username : user_following){
+    const std::deque<std::string>& user_chirp_ids = store_->get(kuserChirps_ + username);
+    for(std::string id : user_chirp_ids){
+      const std::deque<std::string>& this_chirps_values = store_->get(kchirpValue_ + id);
+      chirp::Chirp thisChirp;
+      thisChirp.ParseFromString(this_chirps_values.at(0));
+      if(thisChirp.timestamp().useconds() > start.useconds()){
+        found_chirps.push_back(thisChirp);
+      }
+    }
+  }
+
+  return found_chirps;
 }

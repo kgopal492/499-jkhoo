@@ -1,9 +1,12 @@
+#ifndef ServiceLay
+#define ServiceLay
 #include <map>
 #include <string>
 
 #include <grpcpp/grpcpp.h>
 #include "service.grpc.pb.h"
 #include "key_value_store.h"
+#include <google/protobuf/util/time_util.h>
 
 // Class for logic and data behind the ServiceLayer
 // The methods in this class are the implementation of the Service Layer Service from service.proto
@@ -19,7 +22,7 @@ class ServiceLayer final {
   // Communicates with KeyValueStoreServiceImpl to read from chirp_id
   std::deque<chirp::Chirp> read(const std::string& chirp_id);
   // Communicates with KeyValueStoreServiceImpl to stream chirps from the users username is following
-  chirp::Chirp monitor(const std::string& username);
+  std::deque<chirp::Chirp> monitor(const std::string& username, chirp::Timestamp start);
 
  private:
   // keeps track of the id of the next chirp
@@ -32,3 +35,4 @@ class ServiceLayer final {
   const std::string& kchirpValue_ = "2";
   const std::string& kchirpReplies_ = "3";
 };
+#endif

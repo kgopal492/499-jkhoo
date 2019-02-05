@@ -27,9 +27,28 @@ grpc::Status ServiceLayerServiceImpl::read(grpc::ServerContext* context, const c
   return grpc::Status::OK;
 }
 
-grpc::Status ServiceLayerServiceImpl::monitor(grpc::ServerContext* context, const chirp::MonitorRequest* request, chirp::MonitorReply* reply) {
-  // TODO: stream chirps from following users
-  // GetRequest for key = ActionEnum.kUserFollowing + username to get who is being followed
-  // stream chirps
+grpc::Status ServiceLayerServiceImpl::monitor(grpc::ServerContext* context, grpc::ServerReaderWriter<chirp::MonitorReply, chirp::MonitorRequest>* stream) {
+  chirp::MonitorRequest request;
+  stream->Read(&request);
+
+  chirp::Timestamp initial_time;
+  int64_t seconds = google::protobuf::util::TimeUtil::TimestampToSeconds(google::protobuf::util::TimeUtil::GetEpoch());
+  int64_t useconds = google::protobuf::util::TimeUtil::TimestampToMicroseconds(google::protobuf::util::TimeUtil::GetEpoch());
+  initial_time.set_seconds(seconds);
+  initial_time.set_useconds(useconds);
+
+  while(true){
+    seconds = google::protobuf::util::TimeUtil::TimestampToSeconds(google::protobuf::util::TimeUtil::GetEpoch());
+    useconds = google::protobuf::util::TimeUtil::TimestampToMicroseconds(google::protobuf::util::TimeUtil::GetEpoch());
+    std::deque<chirp::Chirp> found_chirps = service_.monitor(request.username(), initial_time);
+    for(chirp::Chirp c : found_chirps){
+      chirp::MonitorReply reply;
+      reply.set_allocated_chirp(&c);
+      const chirp::MonitorReply& sendingReply = reply;
+      stream->Write(sendingReply);
+    }
+    initial_time.set_seconds(seconds);
+    initial_time.set_useconds(useconds);
+  }
   return grpc::Status::OK;
 }

@@ -1,3 +1,5 @@
+#ifndef KeyValClient
+#define KeyValClient
 #include <deque>
 #include <string>
 
@@ -22,3 +24,4 @@ class KeyValueClient : public KeyValueClientInterface {
   // stub to communicate with KeyValueStore
   std::unique_ptr<chirp::KeyValueStore::Stub> stub_ = chirp::KeyValueStore::NewStub(channel_);
 };
+#endif

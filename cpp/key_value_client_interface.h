@@ -1,3 +1,5 @@
+#ifndef KVClientInterface
+#define KVClientInterface
 #include <deque>
 #include <string>
 
@@ -12,3 +14,4 @@ class KeyValueClientInterface {
   // deletes values associated with the key
   virtual void deletekey(const std::string& key) = 0;
 };
+#endif
