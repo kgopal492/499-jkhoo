@@ -49,6 +49,7 @@ grpc::Status ServiceLayerServiceImpl::monitor(grpc::ServerContext* context, grpc
     }
     initial_time.set_seconds(seconds);
     initial_time.set_useconds(useconds);
+    usleep(10);
   }
   return grpc::Status::OK;
 }

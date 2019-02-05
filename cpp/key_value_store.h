@@ -1,5 +1,5 @@
-#ifndef KVStore
-#define KVStore
+#ifndef cpp_key_value_store_H
+#define cpp_key_value_store_H
 #include <map>
 #include <deque>
 #include <string>

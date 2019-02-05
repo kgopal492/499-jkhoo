@@ -1,5 +1,5 @@
-#ifndef ServiceLay
-#define ServiceLay
+#ifndef cpp_service_H
+#define cpp_service_H
 #include <map>
 #include <string>
 
@@ -30,9 +30,9 @@ class ServiceLayer final {
   // connection to the KeyValueStore
   KeyValueClientInterface* store_;
   // constants for prepended values for categorizing keys
-  const std::string& kuserChirps_ = "0";
-  const std::string& kuserFollowing_ = "1";
-  const std::string& kchirpValue_ = "2";
-  const std::string& kchirpReplies_ = "3";
+  const std::string kuserChirps_ = "0";
+  const std::string kuserFollowing_ = "1";
+  const std::string kchirpValue_ = "2";
+  const std::string kchirpReplies_ = "3";
 };
 #endif

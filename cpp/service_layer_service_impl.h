@@ -1,5 +1,5 @@
-#ifndef ServiceImpl
-#define ServiceImpl
+#ifndef cpp_service_layer_service_impl_H
+#define cpp_service_layer_service_impl_H
 #include <map>
 #include <string>
 
@@ -8,6 +8,7 @@
 #include "service.h"
 #include "key_value_client.h"
 #include <google/protobuf/util/time_util.h>
+#include <unistd.h>
 
 // Class for logic and data behind the ServiceLayer
 // The methods in this class are the implementation of the Service Layer Service from service.proto
