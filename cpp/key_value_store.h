@@ -1,5 +1,5 @@
-#ifndef cpp_key_value_store_H
-#define cpp_key_value_store_H
+#ifndef CPP_KEY_VALUE_STORE_H_
+#define CPP_KEY_VALUE_STORE_H_
 #include <map>
 #include <deque>
 #include <string>

@@ -1,5 +1,5 @@
-#ifndef cpp_service_layer_service_impl_H
-#define cpp_service_layer_service_impl_H
+#ifndef CPP_SERVICE_LAYER_SERVICE_IMPL_H_
+#define CPP_SERVICE_LAYER_SERVICE_IMPL_H_
 #include <map>
 #include <string>
 

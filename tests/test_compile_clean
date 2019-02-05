@@ -1,0 +1,12 @@
+#!/bin/bash
+# Script that will make clean until I have a makefile
+
+rm *.o
+rm -rf service_layer_service_impl_tests
+rm -rf key_value_store_service_impl_tests
+cd ../cpp
+./compile_clean
+cd ../tests
+g++ -Wall -std=c++11 -g key_value_store_service_impl_tests.cc ../cpp/backendStore.pb.o ../cpp/backendStore.grpc.pb.o ../cpp/key_value_store.o ../cpp/key_value_store_service_impl.o ../cpp/key_value_client_interface.o -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc` -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed -ldl -lgtest_main -lgtest -o key_value_store_service_impl_tests
+
+g++ -Wall -std=c++11 -g service_layer_service_impl_tests.cc ../cpp/backendStore.pb.o ../cpp/backendStore.grpc.pb.o ../cpp/service.pb.o ../cpp/service.grpc.pb.o ../cpp/key_value_store.o ../cpp/key_value_store_service_impl.o ../cpp/key_value_client_interface.o ../cpp/service.o -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc` -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed -ldl -lgtest_main -lgtest -o service_layer_service_impl_tests

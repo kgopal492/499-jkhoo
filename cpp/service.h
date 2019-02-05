@@ -1,5 +1,5 @@
-#ifndef cpp_service_H
-#define cpp_service_H
+#ifndef CPP_SERVICE_H_
+#define CPP_SERVICE_H_
 #include <map>
 #include <string>
 

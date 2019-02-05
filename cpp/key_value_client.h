@@ -1,5 +1,5 @@
-#ifndef cpp_key_value_client_H
-#define cpp_key_value_client_H
+#ifndef CPP_KEY_VALUE_CLIENT_H_
+#define CPP_KEY_VALUE_CLIENT_H_
 #include <deque>
 #include <string>
 
