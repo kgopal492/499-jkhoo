@@ -1,3 +1,5 @@
+#ifndef CPP_KEY_VALUE_STORE_H_
+#define CPP_KEY_VALUE_STORE_H_
 #include <map>
 #include <deque>
 #include <string>
@@ -24,3 +26,4 @@ class KeyValueStore : public KeyValueClientInterface {
   // Protects store_
   std::mutex store_mut_;
 };
+#endif

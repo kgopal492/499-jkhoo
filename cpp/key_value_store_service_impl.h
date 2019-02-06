@@ -1,5 +1,5 @@
-#ifndef KVSSI_H
-#define KVSSI_H
+#ifndef CPP_KEY_VALUE_STORE_SERVICE_IMPL_H_
+#define CPP_KEY_VALUE_STORE_SERVICE_IMPL_H_
 #include <map>
 #include <deque>
 #include <string>
