@@ -1,13 +1,22 @@
 #include "service_layer_service_impl.h"
 
 grpc::Status ServiceLayerServiceImpl::registeruser(grpc::ServerContext* context, const chirp::RegisterRequest* request, chirp::RegisterReply* reply) {
+  std::cout<<"In register user"<<std::endl;
+  std::cout<<request->DebugString()<<std::endl;
   service_.registeruser(request->username());
   return grpc::Status::OK;
 }
 
 grpc::Status ServiceLayerServiceImpl::chirp(grpc::ServerContext* context, const chirp::ChirpRequest* request, chirp::ChirpReply* reply) {
+  std::cout<<"In chirp"<<std::endl;
+  std::cout<<request->DebugString()<<std::endl;
   chirp::Chirp this_chirp = service_.chirp(request->username(), request->text(), request->parent_id());
-  reply->set_allocated_chirp(&this_chirp);
+  chirp::Chirp* reply_chirp = reply->mutable_chirp();
+  this_chirp.set_username("fake_username");
+  this_chirp.set_text("fake_text");
+  //reply->set_allocated_chirp(&this_chirp);
+  //reply_chirp->CopyFrom(this_chirp);
+  *reply_chirp = this_chirp;
   return grpc::Status::OK;
 }
 grpc::Status ServiceLayerServiceImpl::follow(grpc::ServerContext* context, const chirp::FollowRequest* request, chirp::FollowReply* reply) {
@@ -22,7 +31,7 @@ grpc::Status ServiceLayerServiceImpl::read(grpc::ServerContext* context, const c
     const chirp::Chirp& added_chirp = c;
     chirp_pointer->CopyFrom(added_chirp);
   }
-  chirp::Chirp* chirp_pointer = reply->add_chirps();
+  //chirp::Chirp* chirp_pointer = reply->add_chirps();
 
   return grpc::Status::OK;
 }
