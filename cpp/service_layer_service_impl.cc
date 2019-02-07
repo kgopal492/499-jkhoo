@@ -12,26 +12,27 @@ grpc::Status ServiceLayerServiceImpl::chirp(grpc::ServerContext* context, const 
   std::cout<<request->DebugString()<<std::endl;
   chirp::Chirp this_chirp = service_.chirp(request->username(), request->text(), request->parent_id());
   chirp::Chirp* reply_chirp = reply->mutable_chirp();
-  this_chirp.set_username("fake_username");
-  this_chirp.set_text("fake_text");
-  //reply->set_allocated_chirp(&this_chirp);
-  //reply_chirp->CopyFrom(this_chirp);
   *reply_chirp = this_chirp;
   return grpc::Status::OK;
 }
 grpc::Status ServiceLayerServiceImpl::follow(grpc::ServerContext* context, const chirp::FollowRequest* request, chirp::FollowReply* reply) {
+  std::cout<<"In follow"<<std::endl;
+  std::cout<<request->DebugString()<<std::endl;
   service_.follow(request->username(), request->to_follow());
   return grpc::Status::OK;
 }
 
 grpc::Status ServiceLayerServiceImpl::read(grpc::ServerContext* context, const chirp::ReadRequest* request, chirp::ReadReply* reply) {
+  std::cout<<"In read"<<std::endl;
+  std::cout<<request->DebugString()<<std::endl;
+  std::cout<<"Here we go"<<std::endl;
   std::deque<chirp::Chirp> read_chirps = service_.read(request->chirp_id());
   for(chirp::Chirp c : read_chirps){
     chirp::Chirp* chirp_pointer = reply->add_chirps();
     const chirp::Chirp& added_chirp = c;
     chirp_pointer->CopyFrom(added_chirp);
   }
-  //chirp::Chirp* chirp_pointer = reply->add_chirps();
+  chirp::Chirp* chirp_pointer = reply->add_chirps();
 
   return grpc::Status::OK;
 }

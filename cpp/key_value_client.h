@@ -14,7 +14,7 @@ class KeyValueClient : public KeyValueClientInterface {
   // puts key value pair in store_, appending value if there is already a value associated with key
   void put(const std::string& key, const std::string& value);
   // gets values associated with the key
-  const std::deque<std::string>& get(const std::string& key);
+  std::deque<std::string> get(const std::string& key);
   // deletes values associated with the key
   void deletekey(const std::string& key);
 

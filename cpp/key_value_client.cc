@@ -10,7 +10,7 @@ void KeyValueClient::put(const std::string& key, const std::string& value) {
   grpc::Status status = stub_->put(&context, request, &reply);
 }
 
-const std::deque<std::string>& KeyValueClient::get(const std::string& key) {
+std::deque<std::string> KeyValueClient::get(const std::string& key) {
   chirp::GetRequest request;
   request.set_key(key);
   chirp::GetReply reply;
@@ -23,9 +23,9 @@ const std::deque<std::string>& KeyValueClient::get(const std::string& key) {
   while(stream_handle->Read(&reply)){
     returnValues.push_back(reply.value());
   }
+  std::cout<<returnValues.at(0)<<std::endl;
 
-  const std::deque<std::string>& returnDeque = returnValues;
-  return returnDeque;
+  return returnValues;
 }
 
 void KeyValueClient::deletekey(const std::string& key) {

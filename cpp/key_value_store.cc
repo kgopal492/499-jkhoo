@@ -6,9 +6,9 @@ void KeyValueStore::put(const std::string& key, const std::string& value) {
   store_[key].push_back(value);
 }
 
-const std::deque<std::string>& KeyValueStore::get(const std::string& key) {
+std::deque<std::string> KeyValueStore::get(const std::string& key) {
   std::lock_guard<std::mutex> lock(store_mut_);
-  const std::deque<std::string>& values = store_[key];
+  std::deque<std::string> values = store_[key];
   return values;
 }
 

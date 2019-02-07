@@ -75,7 +75,7 @@ std::deque<chirp::Chirp> ServiceLayer::read(const std::string& chirp_id) {
       // Adds ids of thisChirp's replies to chirp_list to be read
       const std::string this_chirp_reply_key = kchirpReplies_+curr_chirp_id;
       const std::deque<std::string>& this_chirp_replies = store_->get(this_chirp_reply_key);
-      for (const std::string& reply : this_chirp_replies) {
+      for (const std::string reply : this_chirp_replies) {
         chirp_list.push_back(reply);
       }
     }
