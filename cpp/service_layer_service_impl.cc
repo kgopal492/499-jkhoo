@@ -16,6 +16,10 @@ grpc::Status ServiceLayerServiceImpl::chirp(grpc::ServerContext* context, const 
   std::cout<<"In chirp"<<std::endl;
   std::cout<<request->DebugString()<<std::endl;
   chirp::Chirp this_chirp = service_.chirp(request->username(), request->text(), request->parent_id());
+  if(this_chirp.id() == "ERROR"){
+    grpc::Status parent_not_found = grpc::Status(grpc::StatusCode::INVALID_ARGUMENT, "Invalid Parent ID");
+    return parent_not_found;
+  }
   chirp::Chirp* reply_chirp = reply->mutable_chirp();
   *reply_chirp = this_chirp;
   return grpc::Status::OK;
@@ -23,7 +27,11 @@ grpc::Status ServiceLayerServiceImpl::chirp(grpc::ServerContext* context, const 
 grpc::Status ServiceLayerServiceImpl::follow(grpc::ServerContext* context, const chirp::FollowRequest* request, chirp::FollowReply* reply) {
   std::cout<<"In follow"<<std::endl;
   std::cout<<request->DebugString()<<std::endl;
-  service_.follow(request->username(), request->to_follow());
+  bool success = service_.follow(request->username(), request->to_follow());
+  if(!success){
+    grpc::Status follow_failed = grpc::Status(grpc::StatusCode::INVALID_ARGUMENT, "Follow failed");
+    return follow_failed;
+  }
   return grpc::Status::OK;
 }
 
@@ -37,7 +45,6 @@ grpc::Status ServiceLayerServiceImpl::read(grpc::ServerContext* context, const c
     const chirp::Chirp& added_chirp = c;
     chirp_pointer->CopyFrom(added_chirp);
   }
-  chirp::Chirp* chirp_pointer = reply->add_chirps();
 
   return grpc::Status::OK;
 }

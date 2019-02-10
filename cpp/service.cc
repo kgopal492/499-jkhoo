@@ -5,6 +5,9 @@ ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection) {
   id_mut_ = new std::mutex();
 }
 bool ServiceLayer::registeruser(const std::string& username) {
+  if(username.length() == 0){
+    return false;
+  }
   const std::string userKey = kuserChirps_+username;
   const std::deque<std::string>& this_user = store_->get(userKey);
   if(this_user.size() == 0){
@@ -18,6 +21,15 @@ bool ServiceLayer::registeruser(const std::string& username) {
 }
 
 chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string& text, const std::string& parent_id) {
+  if(parent_id.length() > 0){
+    const std::string this_chirp_parent_key = kchirpValue_+parent_id;
+    const std::deque<std::string>& this_chirps_values = store_->get(this_chirp_parent_key);
+    if(this_chirps_values.size() == 0){
+      chirp::Chirp error_chirp;
+      error_chirp.set_id("ERROR");
+      return error_chirp;
+    }
+  }
   std::string my_id;
   {
     std::lock_guard<std::mutex> lock(*id_mut_);
@@ -56,9 +68,15 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string&
   }
   return this_chirp;
 }
-void ServiceLayer::follow(const std::string& username, const std::string& to_follow) {
+bool ServiceLayer::follow(const std::string& username, const std::string& to_follow) {
+  const std::string to_follow_user = kuserChirps_+to_follow;
+  const std::deque<std::string>& this_users_values = store_->get(to_follow_user);
+  if(this_users_values.size() == 0){
+    return false;
+  }
   const std::string following_user_key = kuserFollowing_+username;
   store_->put(following_user_key, to_follow);
+  return true;
 }
 
 std::deque<chirp::Chirp> ServiceLayer::read(const std::string& chirp_id) {

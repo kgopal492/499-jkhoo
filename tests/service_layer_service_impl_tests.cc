@@ -9,11 +9,9 @@
 // Registers a user and confirms that user key values are correct
 TEST(RegisterUserTest, Simple) {
   KeyValueStore test_store;
-  ASSERT_EQ(-1, -1);
   ServiceLayer service_layer(&test_store);
-  ASSERT_EQ(0, 0);
-  service_layer.registeruser("testUser");
-  ASSERT_EQ(1, 1);
+  bool register_success = service_layer.registeruser("testUser");
+  ASSERT_EQ(true, register_success);
   const std::deque<std::string>& user_value = test_store.get("0testUser");
   ASSERT_EQ(1, user_value.size());
 
@@ -25,7 +23,8 @@ TEST(RegisterUserTest, Simple) {
 TEST(RegisterUserTest, RegisterRegisterFollow) {
   KeyValueStore test_store;
   ServiceLayer service_layer(&test_store);
-  service_layer.registeruser("testUser");
+  bool register_success = service_layer.registeruser("testUser");
+  ASSERT_EQ(true, register_success);
 
   const std::deque<std::string>& user_value = test_store.get("0testUser");
   ASSERT_EQ(1, user_value.size());
@@ -33,7 +32,8 @@ TEST(RegisterUserTest, RegisterRegisterFollow) {
   const std::deque<std::string>& user_following = test_store.get("1testUser");
   ASSERT_EQ(1, user_following.size());
 
-  service_layer.registeruser("testUser2");
+  register_success = service_layer.registeruser("testUser2");
+  ASSERT_EQ(true, register_success);
 
   const std::deque<std::string>& user_value_2 = test_store.get("0testUser2");
   ASSERT_EQ(1, user_value_2.size());
@@ -41,7 +41,8 @@ TEST(RegisterUserTest, RegisterRegisterFollow) {
   const std::deque<std::string>& user_following_2 = test_store.get("1testUser2");
   ASSERT_EQ(1, user_following_2.size());
 
-  service_layer.follow("testUser", "testUser2");
+  bool follow_success = service_layer.follow("testUser", "testUser2");
+  ASSERT_EQ(true, follow_success);
   const std::deque<std::string>& user_following_now = test_store.get("1testUser");
   ASSERT_EQ(2, user_following_now.size());
   ASSERT_EQ("testUser2", user_following_now.at(1));
@@ -51,7 +52,8 @@ TEST(RegisterUserTest, RegisterRegisterFollow) {
 TEST(RegisterUserTest, RegisterChirpRead) {
   KeyValueStore test_store;
   ServiceLayer service_layer(&test_store);
-  service_layer.registeruser("testUser");
+  bool register_success = service_layer.registeruser("testUser");
+  ASSERT_EQ(true, register_success);
 
   const std::deque<std::string>& user_value = test_store.get("0testUser");
   ASSERT_EQ(1, user_value.size());
@@ -76,7 +78,8 @@ TEST(RegisterUserTest, RegisterChirpRead) {
 TEST(RegisterUserTest, RegisterChirpChirpRead) {
   KeyValueStore test_store;
   ServiceLayer service_layer(&test_store);
-  service_layer.registeruser("testUser");
+  bool register_success = service_layer.registeruser("testUser");
+  ASSERT_EQ(true, register_success);
 
   const std::deque<std::string>& user_value = test_store.get("0testUser");
   ASSERT_EQ(1, user_value.size());
@@ -93,19 +96,40 @@ TEST(RegisterUserTest, RegisterChirpChirpRead) {
   ASSERT_EQ("testText2", read_chirps.at(1).text());
 }
 
+// try to register an empty user
+TEST(RegisterUserTest, RegisterEmptyUser) {
+  KeyValueStore test_store;
+  ServiceLayer service_layer(&test_store);
+  bool register_success = service_layer.registeruser("");
+  ASSERT_EQ(false, register_success);
+}
+
+// register a user that already existing_user
+TEST(RegisterUserTest, RegisterExistingUser) {
+  KeyValueStore test_store;
+  ServiceLayer service_layer(&test_store);
+  bool register_success = service_layer.registeruser("TestUser");
+  ASSERT_EQ(true, register_success);
+  register_success = service_layer.registeruser("TestUser");
+  ASSERT_EQ(false, register_success);
+}
+
 // register two users, have the first follow the second, get a current timestamp, second user chirps twice, monitor starting from timestamp
 TEST(FollowingUserTest, FollowMonitor) {
   KeyValueStore test_store;
   ServiceLayer service_layer(&test_store);
-  service_layer.registeruser("testUser");
-  service_layer.registeruser("testUserToFollow");
+  bool register_success = service_layer.registeruser("testUser");
+  ASSERT_EQ(true, register_success);
+  register_success = service_layer.registeruser("testUserToFollow");
+  ASSERT_EQ(true, register_success);
 
   const std::deque<std::string>& user_value = test_store.get("0testUser");
   ASSERT_EQ(1, user_value.size());
   const std::deque<std::string>& user_value2 = test_store.get("0testUserToFollow");
   ASSERT_EQ(1, user_value2.size());
 
-  service_layer.follow("testUser", "testUserToFollow");
+  bool follow_success = service_layer.follow("testUser", "testUserToFollow");
+  ASSERT_EQ(true, follow_success);
   const std::deque<std::string>& user_following = test_store.get("1testUser");
   ASSERT_EQ(2, user_following.size());
 
@@ -121,6 +145,26 @@ TEST(FollowingUserTest, FollowMonitor) {
   ASSERT_EQ(2, monitored_chirps.size());
   ASSERT_EQ("testText", monitored_chirps.at(0).text());
   ASSERT_EQ("testText2", monitored_chirps.at(1).text());
+}
+
+// try to follow a user that does not exist
+TEST(FollowingUserTest, FollowNonexistingUser){
+  KeyValueStore test_store;
+  ServiceLayer service_layer(&test_store);
+  bool register_success = service_layer.registeruser("testUser");
+  ASSERT_EQ(true, register_success);
+  bool follow_success = service_layer.follow("testUser", "testUserToFollow");
+  ASSERT_EQ(false, follow_success);
+}
+
+// chirp with invalid parent id
+TEST(ChirpTest, InvalidParent){
+  KeyValueStore test_store;
+  ServiceLayer service_layer(&test_store);
+  bool register_success = service_layer.registeruser("testUser");
+  ASSERT_EQ(true, register_success);
+  chirp::Chirp generated_chirp = service_layer.chirp("testUser", "hello world", "FAKE_ID");
+  ASSERT_EQ("ERROR", generated_chirp.id());
 }
 
 

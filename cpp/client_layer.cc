@@ -59,6 +59,9 @@ bool sendchirp(std::string username, std::string text, std::string reply_id, std
   grpc::Status status = stub_->chirp(&context, request, &reply);
   if(status.error_code()!=0){
     std::cout<<"Something went wrong :("<<std::endl;
+    if(reply_id.length()>0){
+      std::cout<<"Make sure the parent id actually exists"<<std::endl;
+    }
     return false;
   }
   //std::cout<<status.error_message()<<std::endl;
