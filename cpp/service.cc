@@ -101,7 +101,7 @@ std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username, chir
     if(username.length() > 0){
       const std::deque<std::string>& user_chirp_ids = store_->get(kuserChirps_ + username);
       for(const std::string& id : user_chirp_ids){
-        const std::deque<std::string>& this_chirps_values = store_->get(kchirpValue_ + id);
+        std::deque<std::string> this_chirps_values = store_->get(kchirpValue_ + id);
         chirp::Chirp thisChirp;
         if(this_chirps_values.size() > 0){
           thisChirp.ParseFromString(this_chirps_values.at(0));
@@ -110,6 +110,7 @@ std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username, chir
           std::string thisText = thisChirp.text();
           if(thisChirp.timestamp().useconds() > start.useconds()){
             found_chirps.push_back(thisChirp);
+            std::cout<<thisChirp.text()<<std::endl;
           }
         }
       }

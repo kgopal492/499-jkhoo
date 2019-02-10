@@ -61,9 +61,11 @@ grpc::Status ServiceLayerServiceImpl::monitor(grpc::ServerContext* context, cons
     initial_time.set_seconds(seconds.count());
     initial_time.set_useconds(useconds.count());
     for(chirp::Chirp c : found_chirps){
+      chirp::Chirp* this_chirp = new chirp::Chirp();
+      this_chirp->CopyFrom(c);
       chirp::MonitorReply reply;
-      reply.set_allocated_chirp(&c);
-      const chirp::MonitorReply& sendingReply = reply;
+      reply.set_allocated_chirp(this_chirp);
+      chirp::MonitorReply sendingReply = reply;
       stream->Write(sendingReply);
     }
     usleep(20);
