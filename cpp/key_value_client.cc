@@ -23,7 +23,6 @@ std::deque<std::string> KeyValueClient::get(const std::string& key) {
   while(stream_handle->Read(&reply)){
     returnValues.push_back(reply.value());
   }
-  std::cout<<returnValues.at(0)<<std::endl;
 
   return returnValues;
 }

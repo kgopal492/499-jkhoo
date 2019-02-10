@@ -2,29 +2,38 @@
 
 ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection) {
   store_ = key_value_connection;
+  id_mut_ = new std::mutex();
 }
-void ServiceLayer::registeruser(const std::string& username) {
+bool ServiceLayer::registeruser(const std::string& username) {
   const std::string userKey = kuserChirps_+username;
-  const std::string empty = "";
-  store_->put(userKey, empty);
-
-  const std::string followingUserKey = kuserFollowing_+username;
-  store_->put(followingUserKey, empty);
+  const std::deque<std::string>& this_user = store_->get(userKey);
+  if(this_user.size() == 0){
+    const std::string empty = "";
+    store_->put(userKey, empty);
+    const std::string followingUserKey = kuserFollowing_+username;
+    store_->put(followingUserKey, empty);
+    return true;
+  }
+  return false;
 }
 
 chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string& text, const std::string& parent_id) {
-  const std::string my_id = std::to_string(curr_id_);
-  curr_id_ = curr_id_ + 1;
+  std::string my_id;
+  {
+    std::lock_guard<std::mutex> lock(*id_mut_);
+    my_id = std::to_string(curr_id_);
+    curr_id_ = curr_id_ + 1;
+  }
   chirp::Chirp this_chirp;
   this_chirp.set_username(username);
   this_chirp.set_text(text);
   this_chirp.set_id(my_id);
   this_chirp.set_parent_id(parent_id);
   chirp::Timestamp* chirp_timestamp = new chirp::Timestamp();
-  int64_t seconds = google::protobuf::util::TimeUtil::TimestampToSeconds(google::protobuf::util::TimeUtil::GetEpoch());
-  int64_t useconds = google::protobuf::util::TimeUtil::TimestampToMicroseconds(google::protobuf::util::TimeUtil::GetEpoch());
-  chirp_timestamp->set_seconds(seconds);
-  chirp_timestamp->set_useconds(useconds);
+  std::chrono::seconds seconds = std::chrono::duration_cast< std::chrono::seconds >(std::chrono::system_clock::now().time_since_epoch());
+  std::chrono::microseconds useconds = std::chrono::duration_cast< std::chrono::microseconds >(std::chrono::system_clock::now().time_since_epoch());
+  chirp_timestamp->set_seconds(seconds.count());
+  chirp_timestamp->set_useconds(useconds.count());
   this_chirp.set_allocated_timestamp(chirp_timestamp);
 
   const std::string this_chirp_key = kchirpValue_ + my_id;
@@ -99,7 +108,7 @@ std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username, chir
           int64_t myMicroSeconds = thisChirp.timestamp().useconds();
           int64_t baslineSeconds = start.useconds();
           std::string thisText = thisChirp.text();
-          if(thisChirp.timestamp().useconds() >= start.useconds()){
+          if(thisChirp.timestamp().useconds() > start.useconds()){
             found_chirps.push_back(thisChirp);
           }
         }

@@ -2,6 +2,7 @@
 #define CPP_SERVICE_LAYER_SERVICE_IMPL_H_
 #include <map>
 #include <string>
+#include <chrono>
 
 #include <grpcpp/grpcpp.h>
 #include "service.grpc.pb.h"
@@ -18,7 +19,7 @@ class ServiceLayerServiceImpl final : public chirp::ServiceLayer::Service {
   grpc::Status chirp(grpc::ServerContext* context, const chirp::ChirpRequest* request, chirp::ChirpReply* reply) override;
   grpc::Status follow(grpc::ServerContext* context, const chirp::FollowRequest* request, chirp::FollowReply* reply) override;
   grpc::Status read(grpc::ServerContext* context, const chirp::ReadRequest* request, chirp::ReadReply* reply) override;
-  grpc::Status monitor(grpc::ServerContext* context, grpc::ServerReaderWriter<chirp::MonitorReply, chirp::MonitorRequest>* stream);
+  grpc::Status monitor(grpc::ServerContext* context, const chirp::MonitorRequest* request, grpc::ServerWriter< ::chirp::MonitorReply>* stream) override;
 
  private:
   // interface for grpc calls to key value store
