@@ -5,12 +5,12 @@ ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection) {
   id_mut_ = new std::mutex();
 }
 bool ServiceLayer::registeruser(const std::string& username) {
-  if(username.length() == 0){
+  if (username.length() == 0) {
     return false;
   }
   const std::string userKey = kuserChirps_+username;
   const std::deque<std::string>& this_user = store_->get(userKey);
-  if(this_user.size() == 0){
+  if (this_user.size() == 0) {
     const std::string empty = "";
     store_->put(userKey, empty);
     const std::string followingUserKey = kuserFollowing_+username;
@@ -21,7 +21,7 @@ bool ServiceLayer::registeruser(const std::string& username) {
 }
 
 chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string& text, const std::string& parent_id) {
-  if(parent_id.length() > 0){
+  if (parent_id.length() > 0) {
     const std::string this_chirp_parent_key = kchirpValue_+parent_id;
     const std::deque<std::string>& this_chirps_values = store_->get(this_chirp_parent_key);
     if(this_chirps_values.size() == 0){
@@ -71,7 +71,7 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string&
 bool ServiceLayer::follow(const std::string& username, const std::string& to_follow) {
   const std::string to_follow_user = kuserChirps_+to_follow;
   const std::deque<std::string>& this_users_values = store_->get(to_follow_user);
-  if(this_users_values.size() == 0){
+  if (this_users_values.size() == 0) {
     return false;
   }
   const std::string following_user_key = kuserFollowing_+username;
@@ -115,20 +115,19 @@ std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username, chir
   std::deque<chirp::Chirp> found_chirps;
   const std::string user_following_key = kuserFollowing_ + username;
   const std::deque<std::string>& user_following = store_->get(user_following_key);
-  for(std::string username : user_following){
-    if(username.length() > 0){
+  for (std::string username : user_following) {
+    if (username.length() > 0) {
       const std::deque<std::string>& user_chirp_ids = store_->get(kuserChirps_ + username);
-      for(const std::string& id : user_chirp_ids){
+      for (const std::string& id : user_chirp_ids) {
         std::deque<std::string> this_chirps_values = store_->get(kchirpValue_ + id);
         chirp::Chirp thisChirp;
-        if(this_chirps_values.size() > 0){
+        if (this_chirps_values.size() > 0) {
           thisChirp.ParseFromString(this_chirps_values.at(0));
           int64_t myMicroSeconds = thisChirp.timestamp().useconds();
           int64_t baslineSeconds = start.useconds();
           std::string thisText = thisChirp.text();
-          if(thisChirp.timestamp().useconds() > start.useconds()){
+          if (thisChirp.timestamp().useconds() > start.useconds()) {
             found_chirps.push_back(thisChirp);
-            std::cout<<thisChirp.text()<<std::endl;
           }
         }
       }

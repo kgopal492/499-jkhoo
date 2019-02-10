@@ -1,6 +1,6 @@
 #include "key_value_store_service_impl.h"
 
-// Listens on port 50000 and assembles the server
+// Listens on port 50000 and assembles the key value server
 void RunServer() {
   std::string server_address("0.0.0.0:50000");
   KeyValueStoreServiceImpl service;
@@ -16,6 +16,5 @@ void RunServer() {
 
 int main(int argc, char** argv) {
   RunServer();
-
   return 0;
 }

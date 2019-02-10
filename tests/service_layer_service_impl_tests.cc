@@ -148,7 +148,7 @@ TEST(FollowingUserTest, FollowMonitor) {
 }
 
 // try to follow a user that does not exist
-TEST(FollowingUserTest, FollowNonexistingUser){
+TEST(FollowingUserTest, FollowNonexistingUser) {
   KeyValueStore test_store;
   ServiceLayer service_layer(&test_store);
   bool register_success = service_layer.registeruser("testUser");
@@ -158,7 +158,7 @@ TEST(FollowingUserTest, FollowNonexistingUser){
 }
 
 // chirp with invalid parent id
-TEST(ChirpTest, InvalidParent){
+TEST(ChirpTest, InvalidParent) {
   KeyValueStore test_store;
   ServiceLayer service_layer(&test_store);
   bool register_success = service_layer.registeruser("testUser");

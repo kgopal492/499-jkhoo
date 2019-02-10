@@ -23,7 +23,7 @@ class ServiceLayer final {
   bool follow(const std::string& username, const std::string& to_follow);
   // Communicates with KeyValueStoreServiceImpl to read from chirp_id
   std::deque<chirp::Chirp> read(const std::string& chirp_id);
-  // Communicates with KeyValueStoreServiceImpl to stream chirps from the users username is following
+  // Communicates with KeyValueStoreServiceImpl to stream chirps from the users username is following by returning chirps after start time
   std::deque<chirp::Chirp> monitor(const std::string& username, chirp::Timestamp start);
 
  private:
