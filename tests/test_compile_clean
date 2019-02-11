@@ -1,7 +1,6 @@
 #!/bin/bash
 # Script that will make clean until I have a makefile
 
-rm *.o
 rm -rf service_layer_service_impl_tests
 rm -rf key_value_store_service_impl_tests
 cd ../cpp
