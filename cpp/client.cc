@@ -1,7 +1,7 @@
 #include "client.h"
 
 bool Client::registeruser(std::string username, std::unique_ptr<chirp::ServiceLayer::Stub>& stub_) {
-  if (username.length()==0) {
+  if (username.length() == 0) {
     std::cout<<"Must enter non empty username"<<std::endl;
     return false;
   }
@@ -10,7 +10,7 @@ bool Client::registeruser(std::string username, std::unique_ptr<chirp::ServiceLa
   request.set_username(username);
   chirp::RegisterReply reply;
   grpc::Status status = stub_->registeruser(&context, request, &reply);
-  if (status.error_code()!=0) {
+  if (status.error_code() != 0) {
     std::cout<<"Something went wrong :("<<std::endl;
     return false;
   }
@@ -24,7 +24,7 @@ bool Client::loginuser(std::string username, std::unique_ptr<chirp::ServiceLayer
   request.set_username(username);
   chirp::RegisterReply reply;
   grpc::Status status = stub_->registeruser(&context, request, &reply);
-  if (status.error_code()!=3) {
+  if (status.error_code() != 3) {
     std::cout<<"Something went wrong :("<<std::endl;
     return false;
   }
@@ -41,9 +41,9 @@ void Client::sendchirp(std::string username, std::string text, std::string reply
   request.set_parent_id(reply_id);
 
   grpc::Status status = stub_->chirp(&context, request, &reply);
-  if (status.error_code()!=0) {
+  if (status.error_code() != 0) {
     std::cout<<"Something went wrong :("<<std::endl;
-    if (reply_id.length()>0) {
+    if (reply_id.length() > 0) {
       std::cout<<"Make sure the parent id actually exists"<<std::endl;
     }
   }
@@ -63,7 +63,7 @@ void Client::follow(std::string username, std::string to_follow, std::unique_ptr
     request.set_username(username);
     request.set_to_follow(to_follow);
     grpc::Status status = stub_->follow(&context, request, &reply);
-    if (status.error_code()!=0) {
+    if (status.error_code() != 0) {
       std::cout<<"Something went wrong :("<<std::endl;
     }
     else {
@@ -78,12 +78,12 @@ void Client::read(std::string id, std::unique_ptr<chirp::ServiceLayer::Stub>& st
   chirp::ReadReply reply;
   request.set_chirp_id(id);
   grpc::Status status = stub_->read(&context, request, &reply);
-  if (status.error_code()!=0) {
+  if (status.error_code() != 0) {
     std::cout<<"Something went wrong :("<<std::endl;
   }
   else {
     int num_chirps = reply.chirps_size();
-    for(int i = 0; i<num_chirps - 1; i++) {
+    for(int i = 0; i < num_chirps - 1; i++) {
       chirp::Chirp this_chirp = reply.chirps(i);
       std::cout<<this_chirp.username()<<": "<<this_chirp.text()<<std::endl;
     }

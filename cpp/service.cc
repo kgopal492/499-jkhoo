@@ -1,8 +1,8 @@
 #include "service.h"
 
-ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection) {
+ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection):id_mut_(std::mutex()) {
   store_ = key_value_connection;
-  id_mut_ = new std::mutex();
+  //id_mut_ = new std::mutex();
 }
 bool ServiceLayer::registeruser(const std::string& username) {
   if (username.length() == 0) {
@@ -32,7 +32,7 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string&
   }
   std::string my_id;
   {
-    std::lock_guard<std::mutex> lock(*id_mut_);
+    std::lock_guard<std::mutex> lock(id_mut_);
     my_id = std::to_string(curr_id_);
     curr_id_ = curr_id_ + 1;
   }
