@@ -1,6 +1,6 @@
 #include "service.h"
 
-ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection):id_mut_(std::mutex()) {
+ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection):id_mut_() {
   store_ = key_value_connection;
   //id_mut_ = new std::mutex();
 }
