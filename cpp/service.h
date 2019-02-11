@@ -2,6 +2,8 @@
 #define CPP_SERVICE_H_
 #include <map>
 #include <string>
+#include <mutex>
+#include <chrono>
 
 #include <grpcpp/grpcpp.h>
 #include "service.grpc.pb.h"
@@ -14,19 +16,21 @@ class ServiceLayer final {
  public:
   ServiceLayer(KeyValueClientInterface* key_value_connection);
   // Communicates with KeyValueStoreServiceImpl to register username
-  void registeruser(const std::string& username);
+  bool registeruser(const std::string& username);
   // Communicates with KeyValueStoreServiceImpl to add a chirp
   chirp::Chirp chirp(const std::string& username, const std::string& text, const std::string& parent_id);
   // Communicates with KeyValueStoreServiceImpl to add to_follow to username's list of people following
-  void follow(const std::string& username, const std::string& to_follow);
+  bool follow(const std::string& username, const std::string& to_follow);
   // Communicates with KeyValueStoreServiceImpl to read from chirp_id
   std::deque<chirp::Chirp> read(const std::string& chirp_id);
-  // Communicates with KeyValueStoreServiceImpl to stream chirps from the users username is following
+  // Communicates with KeyValueStoreServiceImpl to stream chirps from the users username is following by returning chirps after start time
   std::deque<chirp::Chirp> monitor(const std::string& username, chirp::Timestamp start);
 
  private:
   // keeps track of the id of the next chirp
   int curr_id_ = 0;
+  // Protects curr_id_
+  std::mutex id_mut_;
   // connection to the KeyValueStore
   KeyValueClientInterface* store_;
   // constants for prepended values for categorizing keys

@@ -25,7 +25,6 @@ TEST(PutGetTest, SameKeyTest) {
 // gets a key without a value
 TEST(GetTest, NoValue) {
   KeyValueStore test_store;
-
   const std::deque<std::string>& values = test_store.get("empty_key");
   ASSERT_EQ(0, values.size());
 }
@@ -45,7 +44,7 @@ TEST(PutGetDeleteTest, SingleValue) {
 }
 
 // adds two values to the KeyValueStore under the same key and deletes the key
-TEST(PutGetDeleteTest, MultiValue){
+TEST(PutGetDeleteTest, MultiValue) {
   KeyValueStore test_store;
   test_store.put("1testkey", "1testvalue");
   test_store.put("1testkey", "2testvalue");

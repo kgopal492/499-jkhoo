@@ -12,12 +12,12 @@ grpc::Status KeyValueStoreServiceImpl::get(grpc::ServerContext* context, grpc::S
   const std::deque<std::string>& values = value_store_.get(request.key());
 
   chirp::GetReply reply;
-  for(const std::string& val : values){
+  for (const std::string& val : values) {
     reply.set_value(val);
     const chirp::GetReply& sendingReply = reply;
     stream->Write(sendingReply);
   }
-  
+
   return grpc::Status::OK;
 }
 

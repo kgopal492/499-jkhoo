@@ -43,3 +43,7 @@ g++ -std=c++11 `pkg-config --cflags protobuf grpc` -g -c -o service_layer_servic
 g++ -std=c++11 `pkg-config --cflags protobuf grpc`  -g -c -o service_layer.o service_layer.cc
 
 g++ backendStore.pb.o backendStore.grpc.pb.o service.pb.o service.grpc.pb.o service_layer.o key_value_client.o service_layer_service_impl.o service.o key_value_client_interface.o -g -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc` -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed -ldl -o service_layer
+
+g++ -std=c++11 `pkg-config --cflags protobuf grpc` -g -c -o client.o client.cc
+
+g++ backendStore.pb.o backendStore.grpc.pb.o service.pb.o service.grpc.pb.o client_layer.cc key_value_client.o service_layer_service_impl.o service.o key_value_client_interface.o client.o -g -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc` -lgflags -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed -ldl -o client_layer

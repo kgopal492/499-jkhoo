@@ -1,30 +1,51 @@
 #include "service.h"
 
-ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection) {
+ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection):id_mut_() {
   store_ = key_value_connection;
+  //id_mut_ = new std::mutex();
 }
-void ServiceLayer::registeruser(const std::string& username) {
+bool ServiceLayer::registeruser(const std::string& username) {
+  if (username.length() == 0) {
+    return false;
+  }
   const std::string userKey = kuserChirps_+username;
-  const std::string empty = "";
-  store_->put(userKey, empty);
-
-  const std::string followingUserKey = kuserFollowing_+username;
-  store_->put(followingUserKey, empty);
+  const std::deque<std::string>& this_user = store_->get(userKey);
+  if (this_user.size() == 0) {
+    const std::string empty = "";
+    store_->put(userKey, empty);
+    const std::string followingUserKey = kuserFollowing_+username;
+    store_->put(followingUserKey, empty);
+    return true;
+  }
+  return false;
 }
 
 chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string& text, const std::string& parent_id) {
-  const std::string my_id = std::to_string(curr_id_);
-  curr_id_ = curr_id_ + 1;
+  if (parent_id.length() > 0) {
+    const std::string this_chirp_parent_key = kchirpValue_+parent_id;
+    const std::deque<std::string>& this_chirps_values = store_->get(this_chirp_parent_key);
+    if(this_chirps_values.size() == 0){
+      chirp::Chirp error_chirp;
+      error_chirp.set_id("ERROR");
+      return error_chirp;
+    }
+  }
+  std::string my_id;
+  {
+    std::lock_guard<std::mutex> lock(id_mut_);
+    my_id = std::to_string(curr_id_);
+    curr_id_ = curr_id_ + 1;
+  }
   chirp::Chirp this_chirp;
   this_chirp.set_username(username);
   this_chirp.set_text(text);
   this_chirp.set_id(my_id);
   this_chirp.set_parent_id(parent_id);
   chirp::Timestamp* chirp_timestamp = new chirp::Timestamp();
-  int64_t seconds = google::protobuf::util::TimeUtil::TimestampToSeconds(google::protobuf::util::TimeUtil::GetEpoch());
-  int64_t useconds = google::protobuf::util::TimeUtil::TimestampToMicroseconds(google::protobuf::util::TimeUtil::GetEpoch());
-  chirp_timestamp->set_seconds(seconds);
-  chirp_timestamp->set_useconds(useconds);
+  std::chrono::seconds seconds = std::chrono::duration_cast< std::chrono::seconds >(std::chrono::system_clock::now().time_since_epoch());
+  std::chrono::microseconds useconds = std::chrono::duration_cast< std::chrono::microseconds >(std::chrono::system_clock::now().time_since_epoch());
+  chirp_timestamp->set_seconds(seconds.count());
+  chirp_timestamp->set_useconds(useconds.count());
   this_chirp.set_allocated_timestamp(chirp_timestamp);
 
   const std::string this_chirp_key = kchirpValue_ + my_id;
@@ -47,9 +68,15 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string&
   }
   return this_chirp;
 }
-void ServiceLayer::follow(const std::string& username, const std::string& to_follow) {
+bool ServiceLayer::follow(const std::string& username, const std::string& to_follow) {
+  const std::string to_follow_user = kuserChirps_+to_follow;
+  const std::deque<std::string>& this_users_values = store_->get(to_follow_user);
+  if (this_users_values.size() == 0) {
+    return false;
+  }
   const std::string following_user_key = kuserFollowing_+username;
   store_->put(following_user_key, to_follow);
+  return true;
 }
 
 std::deque<chirp::Chirp> ServiceLayer::read(const std::string& chirp_id) {
@@ -75,7 +102,7 @@ std::deque<chirp::Chirp> ServiceLayer::read(const std::string& chirp_id) {
       // Adds ids of thisChirp's replies to chirp_list to be read
       const std::string this_chirp_reply_key = kchirpReplies_+curr_chirp_id;
       const std::deque<std::string>& this_chirp_replies = store_->get(this_chirp_reply_key);
-      for (const std::string& reply : this_chirp_replies) {
+      for (const std::string reply : this_chirp_replies) {
         chirp_list.push_back(reply);
       }
     }
@@ -88,18 +115,18 @@ std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username, chir
   std::deque<chirp::Chirp> found_chirps;
   const std::string user_following_key = kuserFollowing_ + username;
   const std::deque<std::string>& user_following = store_->get(user_following_key);
-  for(std::string username : user_following){
-    if(username.length() > 0){
+  for (std::string username : user_following) {
+    if (username.length() > 0) {
       const std::deque<std::string>& user_chirp_ids = store_->get(kuserChirps_ + username);
-      for(const std::string& id : user_chirp_ids){
-        const std::deque<std::string>& this_chirps_values = store_->get(kchirpValue_ + id);
+      for (const std::string& id : user_chirp_ids) {
+        std::deque<std::string> this_chirps_values = store_->get(kchirpValue_ + id);
         chirp::Chirp thisChirp;
-        if(this_chirps_values.size() > 0){
+        if (this_chirps_values.size() > 0) {
           thisChirp.ParseFromString(this_chirps_values.at(0));
           int64_t myMicroSeconds = thisChirp.timestamp().useconds();
           int64_t baslineSeconds = start.useconds();
           std::string thisText = thisChirp.text();
-          if(thisChirp.timestamp().useconds() >= start.useconds()){
+          if (thisChirp.timestamp().useconds() > start.useconds()) {
             found_chirps.push_back(thisChirp);
           }
         }
