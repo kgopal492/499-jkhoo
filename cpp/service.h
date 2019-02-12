@@ -27,10 +27,6 @@ class ServiceLayer final {
   std::deque<chirp::Chirp> monitor(const std::string& username, chirp::Timestamp start);
 
  private:
-  // keeps track of the id of the next chirp
-  int curr_id_ = 0;
-  // Protects curr_id_
-  std::mutex id_mut_;
   // connection to the KeyValueStore
   KeyValueClientInterface* store_;
   // constants for prepended values for categorizing keys

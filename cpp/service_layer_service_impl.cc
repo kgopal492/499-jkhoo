@@ -47,8 +47,8 @@ grpc::Status ServiceLayerServiceImpl::monitor(grpc::ServerContext* context, cons
   std::chrono::microseconds useconds = std::chrono::duration_cast< std::chrono::microseconds >(std::chrono::system_clock::now().time_since_epoch());
   initial_time.set_seconds(seconds.count());
   initial_time.set_useconds(useconds.count());
-
-  while (true) {
+  bool keep_monitoring = true;
+  while (keep_monitoring) {
     std::chrono::seconds seconds = std::chrono::duration_cast< std::chrono::seconds >(std::chrono::system_clock::now().time_since_epoch());
     std::chrono::microseconds useconds = std::chrono::duration_cast< std::chrono::microseconds >(std::chrono::system_clock::now().time_since_epoch());
     std::deque<chirp::Chirp> found_chirps = service_.monitor(request->username(), initial_time);
@@ -61,6 +61,9 @@ grpc::Status ServiceLayerServiceImpl::monitor(grpc::ServerContext* context, cons
       reply.set_allocated_chirp(this_chirp);
       chirp::MonitorReply sendingReply = reply;
       stream->Write(sendingReply);
+    }
+    if(context->IsCancelled()){
+      keep_monitoring = false;
     }
     usleep(20);
   }
