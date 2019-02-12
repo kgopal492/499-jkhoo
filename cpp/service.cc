@@ -11,7 +11,7 @@ bool ServiceLayer::registeruser(const std::string& username) {
   if (username.length() == 0) {
     return false;
   }
-  const std::string userKey = kuserChirps_+username;
+  const std::string userKey = kuserChirps_ + username;
   const std::deque<std::string>& this_user = store_->get(userKey);
   if (this_user.size() == 0) {
     const std::string empty = "";
@@ -36,6 +36,13 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string&
   std::string my_id;
   const std::deque<std::string>& chirp_count = store_->get("chirp_count");
   if (chirp_count.size() == 0){
+    chirp::Chirp error_chirp;
+    error_chirp.set_id("ERROR");
+    return error_chirp;
+  }
+  const std::string this_user_key = kuserChirps_ + username;
+  const std::deque<std::string>& this_user_info = store_->get(this_user_key);
+  if (this_user_info.size() == 0) {
     chirp::Chirp error_chirp;
     error_chirp.set_id("ERROR");
     return error_chirp;

@@ -9,8 +9,6 @@ class Client {
  public:
   // registers user, returns true if successful
   bool registeruser(std::string username, std::unique_ptr<chirp::ServiceLayer::Stub>& stub_);
-  // logs in a user, returns true if successful
-  bool loginuser(std::string username, std::unique_ptr<chirp::ServiceLayer::Stub>& stub_);
   // sends a chirp with the given information
   void sendchirp(std::string username, std::string text, std::string reply_id, std::unique_ptr<chirp::ServiceLayer::Stub>& stub_);
   // adds to_follow to username's list of users following

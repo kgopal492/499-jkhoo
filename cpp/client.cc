@@ -18,20 +18,6 @@ bool Client::registeruser(std::string username, std::unique_ptr<chirp::ServiceLa
   return true;
 }
 
-bool Client::loginuser(std::string username, std::unique_ptr<chirp::ServiceLayer::Stub>& stub_) {
-  grpc::ClientContext context;
-  chirp::RegisterRequest request;
-  request.set_username(username);
-  chirp::RegisterReply reply;
-  grpc::Status status = stub_->registeruser(&context, request, &reply);
-  if (status.error_code() != 3) {
-    std::cout<<"Something went wrong :("<<std::endl;
-    return false;
-  }
-  std::cout<<"User "<<username<<" logged in!"<<std::endl;
-  return true;
-}
-
 void Client::sendchirp(std::string username, std::string text, std::string reply_id, std::unique_ptr<chirp::ServiceLayer::Stub>& stub_) {
   grpc::ClientContext context;
   chirp::ChirpRequest request;

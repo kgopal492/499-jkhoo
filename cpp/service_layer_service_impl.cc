@@ -47,6 +47,7 @@ grpc::Status ServiceLayerServiceImpl::monitor(grpc::ServerContext* context, cons
   std::chrono::microseconds useconds = std::chrono::duration_cast< std::chrono::microseconds >(std::chrono::system_clock::now().time_since_epoch());
   initial_time.set_seconds(seconds.count());
   initial_time.set_useconds(useconds.count());
+  std::set<std::string> read_chirps;
   bool keep_monitoring = true;
   while (keep_monitoring) {
     std::chrono::seconds seconds = std::chrono::duration_cast< std::chrono::seconds >(std::chrono::system_clock::now().time_since_epoch());
@@ -55,12 +56,14 @@ grpc::Status ServiceLayerServiceImpl::monitor(grpc::ServerContext* context, cons
     initial_time.set_seconds(seconds.count());
     initial_time.set_useconds(useconds.count());
     for (chirp::Chirp c : found_chirps) {
-      chirp::Chirp* this_chirp = new chirp::Chirp();
-      this_chirp->CopyFrom(c);
-      chirp::MonitorReply reply;
-      reply.set_allocated_chirp(this_chirp);
-      chirp::MonitorReply sendingReply = reply;
-      stream->Write(sendingReply);
+      if(read_chirps.find(c.id()) == read_chirps.end()){
+        chirp::Chirp* this_chirp = new chirp::Chirp();
+        this_chirp->CopyFrom(c);
+        chirp::MonitorReply reply;
+        reply.set_allocated_chirp(this_chirp);
+        chirp::MonitorReply sendingReply = reply;
+        stream->Write(sendingReply);
+      }
     }
     if(context->IsCancelled()){
       keep_monitoring = false;
