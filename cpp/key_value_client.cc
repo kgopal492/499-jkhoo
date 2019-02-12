@@ -20,7 +20,7 @@ std::deque<std::string> KeyValueClient::get(const std::string& key) {
   stream_handle->Write(request);
 
   std::deque<std::string> returnValues;
-  while(stream_handle->Read(&reply)){
+  while (stream_handle->Read(&reply)) {
     returnValues.push_back(reply.value());
   }
 
