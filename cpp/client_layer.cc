@@ -24,10 +24,7 @@ int main(int argc, char** argv) {
     client.registeruser(FLAGS_register, stub_);
   }
   if (FLAGS_user != "") {
-    bool loggedin = client.loginuser(FLAGS_user, stub_);
-    if (loggedin) {
-      my_username=FLAGS_user;
-    }
+    my_username = FLAGS_user;
   }
   if (FLAGS_chirp != "" && my_username != "") {
     client.sendchirp(my_username, FLAGS_chirp, FLAGS_reply, stub_);

@@ -41,6 +41,14 @@ Go to 499-jkhoo/cpp and run `./compile_clean` to compile everything except tests
 Start the Key Value store with `./backend_store`  
 Start the Service Layer with `./service_layer`  
 Run the client layer with `./client_layer` and any appropriate flags  
+#### Example runs for the client layer:  
+`./client_layer --register <username>`registers the given user  
+`./client_layer --user <username>` logs in the given user and the --user flag must be before any command other than register  
+`./client_layer --user <username> --chirp <text>` creates a new chirp by the user with the given text  
+`./client_layer --user <username> --chirp <text> --reply <parent_id>` creates a new chirp by the user with the given text as a reply to the chirp with the given parent_id  
+`./client_layer --user <username> --follow <to_follow>` username starts following to_follow  
+`./client_layer --user <username> --read <chirp_id>` reads the chirp thread starting at the given id  
+`./client_layer --user <username> --monitor` streams new chirps from those currently followed  
 
 ## Compiling and running the tests:  
 Go to 499-jkhoo/tests and run `./test_compile_clean`  

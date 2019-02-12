@@ -1,14 +1,17 @@
 #include "service.h"
 
-ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection):id_mut_() {
+ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection) {
   store_ = key_value_connection;
-  //id_mut_ = new std::mutex();
+  const std::deque<std::string>& chirp_count = store_->get("chirp_count");
+  if(chirp_count.size() == 0){
+    store_->put("chirp_count", "0");
+  }
 }
 bool ServiceLayer::registeruser(const std::string& username) {
   if (username.length() == 0) {
     return false;
   }
-  const std::string userKey = kuserChirps_+username;
+  const std::string userKey = kuserChirps_ + username;
   const std::deque<std::string>& this_user = store_->get(userKey);
   if (this_user.size() == 0) {
     const std::string empty = "";
@@ -31,11 +34,23 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username, const std::string&
     }
   }
   std::string my_id;
-  {
-    std::lock_guard<std::mutex> lock(id_mut_);
-    my_id = std::to_string(curr_id_);
-    curr_id_ = curr_id_ + 1;
+  const std::deque<std::string>& chirp_count = store_->get("chirp_count");
+  if (chirp_count.size() == 0){
+    chirp::Chirp error_chirp;
+    error_chirp.set_id("ERROR");
+    return error_chirp;
   }
+  const std::string this_user_key = kuserChirps_ + username;
+  const std::deque<std::string>& this_user_info = store_->get(this_user_key);
+  if (this_user_info.size() == 0) {
+    chirp::Chirp error_chirp;
+    error_chirp.set_id("ERROR");
+    return error_chirp;
+  }
+  my_id = chirp_count.at(0);
+  int curr_id_ = std::stoi(my_id)+1;
+  store_->deletekey("chirp_count");
+  store_->put("chirp_count", std::to_string(curr_id_));
   chirp::Chirp this_chirp;
   this_chirp.set_username(username);
   this_chirp.set_text(text);
@@ -107,6 +122,9 @@ std::deque<chirp::Chirp> ServiceLayer::read(const std::string& chirp_id) {
       }
     }
   }
+  std::sort(read_chirps.begin(), read_chirps.end(), [](const chirp::Chirp& chirp1, const chirp::Chirp& chirp2){
+    return chirp1.timestamp().useconds() < chirp2.timestamp().useconds();
+  });
 
   return read_chirps;
 }
