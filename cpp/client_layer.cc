@@ -1,6 +1,6 @@
-#include <iostream>
 #include <gflags/gflags.h>
 #include <grpcpp/grpcpp.h>
+#include <iostream>
 
 #include "client.h"
 #include "service.grpc.pb.h"
@@ -47,8 +47,8 @@ int main(int argc, char** argv) {
     client.monitor(my_username, stub_);
     logged_in_action_needed = false;
   }
-  if (logged_in_action_needed){
-    std::cout<<"You did not perform an action after logging in"<<std::endl;
+  if (logged_in_action_needed) {
+    std::cout << "You did not perform an action after logging in" << std::endl;
   }
 
   return 0;
