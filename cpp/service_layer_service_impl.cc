@@ -63,6 +63,7 @@ grpc::Status ServiceLayerServiceImpl::monitor(grpc::ServerContext* context, cons
         reply.set_allocated_chirp(this_chirp);
         chirp::MonitorReply sendingReply = reply;
         stream->Write(sendingReply);
+        read_chirps.insert(c.id());
       }
     }
     if(context->IsCancelled()){
