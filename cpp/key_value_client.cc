@@ -1,6 +1,5 @@
 #include "key_value_client.h"
 
-
 void KeyValueClient::put(const std::string& key, const std::string& value) {
   chirp::PutRequest request;
   request.set_key(key);
@@ -16,7 +15,8 @@ std::deque<std::string> KeyValueClient::get(const std::string& key) {
   chirp::GetReply reply;
   grpc::ClientContext context;
 
-  std::unique_ptr<grpc::ClientReaderWriter<chirp::GetRequest, chirp::GetReply> > stream_handle (stub_->get(&context));
+  std::unique_ptr<grpc::ClientReaderWriter<chirp::GetRequest, chirp::GetReply> >
+      stream_handle(stub_->get(&context));
   stream_handle->Write(request);
 
   std::deque<std::string> returnValues;
