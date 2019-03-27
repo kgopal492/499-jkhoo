@@ -1,9 +1,9 @@
 #ifndef CPP_KEY_VALUE_STORE_H_
 #define CPP_KEY_VALUE_STORE_H_
-#include <map>
 #include <deque>
-#include <string>
+#include <map>
 #include <mutex>
+#include <string>
 
 #include <grpcpp/grpcpp.h>
 #include "backendStore.grpc.pb.h"
@@ -13,9 +13,10 @@
 class KeyValueStore : public KeyValueClientInterface {
  public:
   virtual ~KeyValueStore(){};
-  // puts key value pair in store_, appending value if there is already a value associated with key
+  // puts key value pair in store_, appending value if there is already a value
+  // associated with key
   void put(const std::string& key, const std::string& value);
-  // gets values associated with the key
+  // gets values associated with the key and returns as a deque
   std::deque<std::string> get(const std::string& key);
   // deletes values associated with the key
   void deletekey(const std::string& key);
