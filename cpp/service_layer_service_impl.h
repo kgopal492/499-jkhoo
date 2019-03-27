@@ -16,23 +16,28 @@
 // from service.proto
 class ServiceLayerServiceImpl final : public chirp::ServiceLayer::Service {
  public:
-  // grpc function for registeruser
+  // grpc function for registeruser, returns Status::OK if successful, returns
+  // Status::INVALID_ARGUMENT for invalid input
   grpc::Status registeruser(grpc::ServerContext* context,
                             const chirp::RegisterRequest* request,
                             chirp::RegisterReply* reply) override;
-  // grpc function for chirp
+  // grpc function for chirp, returns Status::OK if successful, returns
+  // Status::INVALID_ARGUMENT for invalid input
   grpc::Status chirp(grpc::ServerContext* context,
                      const chirp::ChirpRequest* request,
                      chirp::ChirpReply* reply) override;
-  // grpc function for follow
+  // grpc function for follow, returns Status::OK if successful, returns
+  // Status::INVALID_ARGUMENT for invalid input
   grpc::Status follow(grpc::ServerContext* context,
                       const chirp::FollowRequest* request,
                       chirp::FollowReply* reply) override;
-  // grpc function for read
+  // grpc function for read, returns Status::OK if successful, returns
+  // Status::INVALID_ARGUMENT for invalid input
   grpc::Status read(grpc::ServerContext* context,
                     const chirp::ReadRequest* request,
                     chirp::ReadReply* reply) override;
-  // grpc function for monitor
+  // grpc function for monitor, returns Status::OK if successful, returns
+  // Status::INVALID_ARGUMENT for invalid input
   grpc::Status monitor(
       grpc::ServerContext* context, const chirp::MonitorRequest* request,
       grpc::ServerWriter< ::chirp::MonitorReply>* stream) override;

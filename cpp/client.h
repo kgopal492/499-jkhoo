@@ -7,10 +7,11 @@
 // class behind the client layer
 class Client {
  public:
-  // registers user, returns true if successful
+  // registers user with given username, returns true if successful
   bool registeruser(std::string username,
                     std::unique_ptr<chirp::ServiceLayer::Stub>& stub_);
-  // sends a chirp with the given information
+  // sends a chirp by given user with given text. Optionally as a reply to a
+  // chirp with given reply_id
   void sendchirp(std::string username, std::string text, std::string reply_id,
                  std::unique_ptr<chirp::ServiceLayer::Stub>& stub_);
   // adds to_follow to username's list of users following
