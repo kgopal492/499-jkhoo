@@ -53,5 +53,7 @@ class ServiceLayer final {
   const std::string kchirpValue_ = "2";
   // constant for the key that holds the ids of a chirp's replies
   const std::string kchirpReplies_ = "3";
+  // constant for the key that holds the hashtags that are being followed
+  const std::string kchirpReplies_ = "4";
 };
 #endif

@@ -190,3 +190,26 @@ std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username,
 
   return found_chirps;
 }
+
+std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag,
+                                               chirp::Timestamp start) {
+  std::deque<chirp::Chirp> found_chirps;
+  const std::string hashtag_key = khashtag_ + hashtag;
+  const std::deque<std::string>& hashtag_chirps =
+      store_->get(hashtag_key);
+  for (const std::string& id : hashtag_chirps) {
+    std::deque<std::string> this_chirps_values =
+        store_->get(kchirpValue_ + id);
+    chirp::Chirp thisChirp;
+    if (this_chirps_values.size() > 0) {
+      thisChirp.ParseFromString(this_chirps_values.at(0));
+      int64_t myMicroSeconds = thisChirp.timestamp().useconds();
+      int64_t baslineSeconds = start.useconds();
+      if (thisChirp.timestamp().useconds() > start.useconds()) {
+        found_chirps.push_back(thisChirp);
+      }
+    }
+  }
+
+  return found_chirps;
+}
