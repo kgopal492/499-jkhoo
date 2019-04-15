@@ -102,7 +102,7 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username,
   }
 
   storeHashtags(text, my_id);
-  
+
   return this_chirp;
 }
 
@@ -239,8 +239,6 @@ std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag,
     chirp::Chirp thisChirp;
     if (this_chirps_values.size() > 0) {
       thisChirp.ParseFromString(this_chirps_values.at(0));
-      int64_t myMicroSeconds = thisChirp.timestamp().useconds();
-      int64_t baslineSeconds = start.useconds();
       if (thisChirp.timestamp().useconds() > start.useconds()) {
         found_chirps.push_back(thisChirp);
       }
