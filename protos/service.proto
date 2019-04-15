@@ -72,4 +72,5 @@ service ServiceLayer {
   rpc follow (FollowRequest) returns (FollowReply) {}
   rpc read (ReadRequest) returns (ReadReply) {}
   rpc monitor (MonitorRequest) returns (stream MonitorReply) {}
+  rpc stream (StreamRequest) returns (stream StreamReply) {}
 }

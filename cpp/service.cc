@@ -101,13 +101,14 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username,
     store_->put(chirp_parent_id, my_id);
   }
 
+  // TODO: check whether hashtag contains '#' character
   std::string temp_text = text;
   size_t hash_index = temp_text.find("#");
   while (hash_index != std::string::npos) {
     std::string hashtag = temp_text.substr(hash_index+1);
     size_t space_index = hashtag.find(" ");
     if (space_index  != std::string::npos) {
-      hashtag = temp_text.substr(0, space_index);
+      hashtag = hashtag.substr(0, space_index);
       temp_text = temp_text.substr(space_index);
     } else {
       temp_text = temp_text.substr(temp_text.length());
@@ -126,10 +127,10 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username,
         store_->put(hashtag_key, my_id);
       }
     }
-    temp_text = temp_text.substr(space_index);
     hash_index = temp_text.find("#");
+    std::cout << "HASHTAG" << hashtag << std::endl;
   }
-
+  std::cout << "made it here" << std::endl;
   return this_chirp;
 }
 
