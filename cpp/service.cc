@@ -101,6 +101,12 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username,
     store_->put(chirp_parent_id, my_id);
   }
 
+  storeHashtags(text, my_id);
+  
+  return this_chirp;
+}
+
+void ServiceLayer::storeHashtags(const std::string& text, const std::string& chirp_id) {
   // TODO: check whether hashtag contains '#' character
   std::string temp_text = text;
   size_t hash_index = temp_text.find("#");
@@ -118,18 +124,17 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username,
       const std::deque<std::string>& hashtag_chirp_ids = store_->get(hashtag_key);
       bool chirp_added = false;
       for (std::string curr_hash_chirp_id : hashtag_chirp_ids) {
-        if(curr_hash_chirp_id == my_id) {
+        if(curr_hash_chirp_id == chirp_id) {
           chirp_added = true;
           break;
         }
       }
       if (!chirp_added) {
-        store_->put(hashtag_key, my_id);
+        store_->put(hashtag_key, chirp_id);
       }
     }
     hash_index = temp_text.find("#");
   }
-  return this_chirp;
 }
 
 bool ServiceLayer::follow(const std::string& username,
@@ -223,6 +228,7 @@ std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username,
 
 std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag,
                                                chirp::Timestamp start) {
+  // TODO: check if username exists
   std::deque<chirp::Chirp> found_chirps;
   const std::string hashtag_key = khashtag_ + hashtag;
   const std::deque<std::string>& hashtag_chirps =
