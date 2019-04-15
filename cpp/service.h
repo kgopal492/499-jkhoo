@@ -49,7 +49,7 @@ class ServiceLayer final {
                                        const std::string& parent_id);
   // helper function to extract hashtags from a chirp and store chirp_id
   // with hashtag key
-  void ServiceLayer::storeHashtags(const std::string& text, const std::string& chirp_id);
+  void storeHashtags(const std::string& text, const std::string& chirp_id);
   // connection to the KeyValueStore
   KeyValueClientInterface* store_;
   // constants for prepended values for categorizing keys
