@@ -128,9 +128,7 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username,
       }
     }
     hash_index = temp_text.find("#");
-    std::cout << "HASHTAG" << hashtag << std::endl;
   }
-  std::cout << "made it here" << std::endl;
   return this_chirp;
 }
 
