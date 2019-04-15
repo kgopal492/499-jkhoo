@@ -22,6 +22,9 @@ class Client {
   // streams chirps from users username is following
   void monitor(std::string username,
                std::unique_ptr<chirp::ServiceLayer::Stub>& stub_);
+  // streams chirps made containing a provided hashtag
+  void stream(std::string hashtag,
+               std::unique_ptr<chirp::ServiceLayer::Stub>& stub_);
 
  private:
 };

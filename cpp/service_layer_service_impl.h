@@ -41,6 +41,11 @@ class ServiceLayerServiceImpl final : public chirp::ServiceLayer::Service {
   grpc::Status monitor(
       grpc::ServerContext* context, const chirp::MonitorRequest* request,
       grpc::ServerWriter< ::chirp::MonitorReply>* stream) override;
+  // grpc function for stream, returns Status::OK if successful, returns
+  // Status::INVALID_ARGUMENT for invalid hashtag input
+  grpc::Status stream(
+      grpc::ServerContext* context, const chirp::StreamRequest* request,
+      grpc::ServerWriter< ::chirp::StreamReply>* stream) override;
 
  private:
   // interface for grpc calls to key value store
