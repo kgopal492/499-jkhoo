@@ -100,8 +100,43 @@ chirp::Chirp ServiceLayer::chirp(const std::string& username,
     const std::string this_chirp_id = my_id;
     store_->put(chirp_parent_id, my_id);
   }
+
+  storeHashtags(text, my_id);
+
   return this_chirp;
 }
+
+void ServiceLayer::storeHashtags(const std::string& text, const std::string& chirp_id) {
+  // TODO: check whether hashtag contains '#' character
+  std::string temp_text = text;
+  size_t hash_index = temp_text.find("#");
+  while (hash_index != std::string::npos) {
+    std::string hashtag = temp_text.substr(hash_index+1);
+    size_t space_index = hashtag.find(" ");
+    if (space_index  != std::string::npos) {
+      hashtag = hashtag.substr(0, space_index);
+      temp_text = temp_text.substr(space_index);
+    } else {
+      temp_text = temp_text.substr(temp_text.length());
+    }
+    if (hashtag.length() != 0) {
+      const std::string hashtag_key = khashtag_ + hashtag;
+      const std::deque<std::string>& hashtag_chirp_ids = store_->get(hashtag_key);
+      bool chirp_added = false;
+      for (std::string curr_hash_chirp_id : hashtag_chirp_ids) {
+        if(curr_hash_chirp_id == chirp_id) {
+          chirp_added = true;
+          break;
+        }
+      }
+      if (!chirp_added) {
+        store_->put(hashtag_key, chirp_id);
+      }
+    }
+    hash_index = temp_text.find("#");
+  }
+}
+
 bool ServiceLayer::follow(const std::string& username,
                           const std::string& to_follow) {
   if (username == to_follow) {
@@ -184,6 +219,28 @@ std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username,
             found_chirps.push_back(thisChirp);
           }
         }
+      }
+    }
+  }
+
+  return found_chirps;
+}
+
+std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag,
+                                               chirp::Timestamp start) {
+  // TODO: check if username exists
+  std::deque<chirp::Chirp> found_chirps;
+  const std::string hashtag_key = khashtag_ + hashtag;
+  const std::deque<std::string>& hashtag_chirps =
+      store_->get(hashtag_key);
+  for (const std::string& id : hashtag_chirps) {
+    std::deque<std::string> this_chirps_values =
+        store_->get(kchirpValue_ + id);
+    chirp::Chirp thisChirp;
+    if (this_chirps_values.size() > 0) {
+      thisChirp.ParseFromString(this_chirps_values.at(0));
+      if (thisChirp.timestamp().useconds() > start.useconds()) {
+        found_chirps.push_back(thisChirp);
       }
     }
   }

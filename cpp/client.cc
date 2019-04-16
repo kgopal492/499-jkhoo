@@ -98,3 +98,23 @@ void Client::monitor(std::string username,
     }
   }
 }
+
+void Client::stream(const std::string& hashtag,
+                     const std::unique_ptr<chirp::ServiceLayer::Stub>& stub_) {
+  grpc::ClientContext context;
+  chirp::StreamRequest request;
+  request.set_hashtag(hashtag);
+  chirp::StreamReply reply;
+  std::unique_ptr<grpc::ClientReader<chirp::StreamReply> > stream_handle(
+      stub_->stream(&context, request));
+  // continues requesting chirps until program is quit
+  // and connection is closed
+  while (true) {
+    chirp::Chirp this_chirp;
+    while (stream_handle->Read(&reply)) {
+      this_chirp = reply.chirp();
+      std::cout << this_chirp.username() << ": " << this_chirp.text()
+                << std::endl;
+    }
+  }
+}

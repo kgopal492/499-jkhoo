@@ -35,6 +35,11 @@ class ServiceLayer final {
   // time
   std::deque<chirp::Chirp> monitor(const std::string& username,
                                    chirp::Timestamp start);
+  // Communicates with KeyValueStoreServiceImpl to stream chirps from the users
+  // username is following by returning a deque of chirps created after start
+  // time
+  std::deque<chirp::Chirp> stream(const std::string& hashtag,
+                                   chirp::Timestamp start);
 
  private:
   // helper function for chirp to create a Chirp message with the given
@@ -42,6 +47,9 @@ class ServiceLayer final {
   chirp::Chirp chirpConstructionHelper(const std::string& username,
                                        const std::string& text,
                                        const std::string& parent_id);
+  // helper function to extract hashtags from a chirp and store chirp_id
+  // with hashtag key
+  void storeHashtags(const std::string& text, const std::string& chirp_id);
   // connection to the KeyValueStore
   KeyValueClientInterface* store_;
   // constants for prepended values for categorizing keys
@@ -53,5 +61,7 @@ class ServiceLayer final {
   const std::string kchirpValue_ = "2";
   // constant for the key that holds the ids of a chirp's replies
   const std::string kchirpReplies_ = "3";
+  // constant for the key that holds the hashtags that are being followed
+  const std::string khashtag_ = "4";
 };
 #endif
