@@ -112,6 +112,7 @@ void ServiceLayer::storeHashtags(const std::string& text, const std::string& chi
   size_t hash_index = temp_text.find("#");
   while (hash_index != std::string::npos) {
     std::string hashtag = temp_text.substr(hash_index+1);
+    // TODO: check whether hash_index+1 is a position that exists
     size_t space_index = hashtag.find(" ");
     if (space_index  != std::string::npos) {
       hashtag = hashtag.substr(0, space_index);
@@ -130,9 +131,11 @@ void ServiceLayer::storeHashtags(const std::string& text, const std::string& chi
         }
       }
       if (!chirp_added) {
+        std::cout << "putting hashtag in kvs: " << hastag << std:: endl;
         store_->put(hashtag_key, chirp_id);
       }
     }
+    std::cout << "HASHTAG: #" << hastag << std:: endl;
     hash_index = temp_text.find("#");
   }
 }
