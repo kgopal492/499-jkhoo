@@ -277,3 +277,8 @@ void ServiceLayer::endstream(const std::string& hashtag, const std::string& user
     store_->put(khashtagStreamers_ + hashtag, streamer);
   }
 }
+
+bool ServiceLayer::beginstream(const std::string& hashtag, const std::string& username) {
+  store_->put(khashtagStreamers_ + hashtag, username);
+  return true; // TODO: return false if username or hashtag invalid
+}

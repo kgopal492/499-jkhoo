@@ -45,6 +45,10 @@ class ServiceLayer final {
   void endstream(const std::string& hashtag,
                                   const std::string& username);
 
+  // Adds user to streaming queue for a specific hashtag
+  bool beginstream(const std::string& hashtag,
+                                  const std::string& username);
+
  private:
   // helper function for chirp to create a Chirp message with the given
   // username, text, and parent_id

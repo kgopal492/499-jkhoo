@@ -101,6 +101,7 @@ grpc::Status ServiceLayerServiceImpl::stream(
   std::set<std::string> read_chirps;
   bool keep_streaming = true;
   std::deque<chirp::Chirp> found_chirps;
+  service_.beginstream(request->hashtag(), request->username());
   while (keep_streaming) {
     found_chirps = service_.stream(request->hashtag(), request->username());
     for (const chirp::Chirp c : found_chirps) {
