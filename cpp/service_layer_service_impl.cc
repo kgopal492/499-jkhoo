@@ -98,26 +98,11 @@ grpc::Status ServiceLayerServiceImpl::monitor(
 grpc::Status ServiceLayerServiceImpl::stream(
     grpc::ServerContext* context, const chirp::StreamRequest* request,
     grpc::ServerWriter< ::chirp::StreamReply>* stream) {
-  chirp::Timestamp initial_time;
-  std::chrono::seconds current_time_seconds =
-      std::chrono::duration_cast<std::chrono::seconds>(
-          std::chrono::system_clock::now().time_since_epoch());
-  std::chrono::microseconds current_time_useconds =
-      std::chrono::duration_cast<std::chrono::microseconds>(
-          std::chrono::system_clock::now().time_since_epoch());
-  initial_time.set_seconds(current_time_seconds.count());
-  initial_time.set_useconds(current_time_useconds.count());
   std::set<std::string> read_chirps;
   bool keep_streaming = true;
   std::deque<chirp::Chirp> found_chirps;
   while (keep_streaming) {
-    current_time_seconds = std::chrono::duration_cast<std::chrono::seconds>(
-        std::chrono::system_clock::now().time_since_epoch());
-    current_time_useconds = std::chrono::duration_cast<std::chrono::microseconds>(
-        std::chrono::system_clock::now().time_since_epoch());
-    found_chirps = service_.stream(request->hashtag(), initial_time);
-    initial_time.set_seconds(current_time_seconds.count());
-    initial_time.set_useconds(current_time_useconds.count());
+    found_chirps = service_.stream(request->hashtag());
     for (const chirp::Chirp c : found_chirps) {
       if (read_chirps.find(c.id()) == read_chirps.end()) {
         chirp::Chirp* this_chirp = new chirp::Chirp();
