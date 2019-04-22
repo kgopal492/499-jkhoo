@@ -233,7 +233,8 @@ std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username,
   return found_chirps;
 }
 
-std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag) {
+std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag,
+                                               chirp::Timestamp start) {
   // TODO: check if username exists
   std::deque<chirp::Chirp> found_chirps;
   const std::string hashtag_key = khashtag_ + hashtag;
