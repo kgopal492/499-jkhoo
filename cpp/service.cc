@@ -9,7 +9,6 @@ ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection) {
   }
 }
 bool ServiceLayer::registeruser(const std::string& username) {
-  std::lock_guard<std::mutex> lock(*service_sema);
   if (username.length() == 0) {
     return false;
   }
@@ -149,7 +148,6 @@ void ServiceLayer::storeHashtags(const std::string& text, const std::string& chi
 
 bool ServiceLayer::follow(const std::string& username,
                           const std::string& to_follow) {
-  std::lock_guard<std::mutex> lock(*service_sema);
   if (username == to_follow) {
     return false;
   }
@@ -170,7 +168,6 @@ bool ServiceLayer::follow(const std::string& username,
 }
 
 std::deque<chirp::Chirp> ServiceLayer::read(const std::string& chirp_id) {
-  std::lock_guard<std::mutex> lock(*service_sema);
   std::deque<chirp::Chirp> read_chirps;
 
   // Stores chirps to read
@@ -211,7 +208,6 @@ std::deque<chirp::Chirp> ServiceLayer::read(const std::string& chirp_id) {
 
 std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username,
                                                chirp::Timestamp start) {
-  std::lock_guard<std::mutex> lock(*service_sema);
   std::deque<chirp::Chirp> found_chirps;
   const std::string user_following_key = kuserFollowing_ + username;
   const std::deque<std::string>& user_following =
