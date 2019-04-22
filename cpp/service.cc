@@ -235,7 +235,6 @@ std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag,
                                                const std::string& username) {
 
   std::deque<chirp::Chirp> found_chirps;
-
   // check if username exists
   const std::string this_user_key = kuserChirps_ + username;
   const std::deque<std::string>& this_user_info = store_->get(this_user_key);
@@ -248,6 +247,7 @@ std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag,
 
   // retrieve all hashtag chirps
   const std::string hashtag_key = kuserHashtag_ + username + kdivideUserHashtag_ + hashtag;
+  std::cout << "ServiceLayer::stream hashtag_key: " << hashtag_key << std::endl;
   const std::deque<std::string>& hashtag_chirps = store_->get(hashtag_key);
   for (const std::string& id : hashtag_chirps) {
     std::deque<std::string> this_chirps_values =
@@ -262,8 +262,7 @@ std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag,
   return found_chirps;
 }
 
-void ServiceLayer::endstream(const std::string& hashtag,
-                                               const std::string& username) {
+void ServiceLayer::endstream(const std::string& hashtag, const std::string& username) {
   const std::string hashtag_key = kuserHashtag_ + username + kdivideUserHashtag_ + hashtag;
   store_->deletekey(hashtag_key);
   std::deque<std::string> remaining_streamers;

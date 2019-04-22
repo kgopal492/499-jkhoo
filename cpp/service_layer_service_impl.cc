@@ -104,6 +104,10 @@ grpc::Status ServiceLayerServiceImpl::stream(
   while (keep_streaming) {
     found_chirps = service_.stream(request->hashtag(), request->username());
     for (const chirp::Chirp c : found_chirps) {
+      if(c.id == "ERROR") {
+        keep_streaming = false;
+        return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT, "Username does not exist");
+      }
       if (read_chirps.find(c.id()) == read_chirps.end()) {
         chirp::Chirp* this_chirp = new chirp::Chirp();
         this_chirp->CopyFrom(c);
