@@ -62,5 +62,7 @@ class ServiceLayer final {
   const std::string kchirpReplies_ = "3";
   // constant for the key that holds the hashtags that are being followed
   const std::string khashtag_ = "4";
+  // mutex pointer to lock functions in exectuion
+  std::mutex* service_sema;
 };
 #endif
