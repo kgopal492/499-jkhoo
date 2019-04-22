@@ -99,8 +99,8 @@ void Client::monitor(std::string username,
   }
 }
 
-void Client::stream(const std::string& hashtag,
-                     const std::unique_ptr<chirp::ServiceLayer::Stub>& stub_) {
+void Client::stream(std::string hashtag,
+                    std::unique_ptr<chirp::ServiceLayer::Stub>& stub_) {
   grpc::ClientContext context;
   chirp::StreamRequest request;
   request.set_hashtag(hashtag);

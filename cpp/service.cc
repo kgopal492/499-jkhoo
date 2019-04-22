@@ -133,6 +133,10 @@ void ServiceLayer::storeHashtags(const std::string& text, const std::string& chi
       if (!chirp_added) {
         std::cout << "putting hashtag in kvs: " << hastag << std:: endl;
         store_->put(hashtag_key, chirp_id);
+        std::deck<std::string> chirp_ids = store->get(hashtag_key);
+        for(std::string id : chirp_ids) {
+          std::cout << "Curr chirp id: " << id << std::endl;
+        }
       }
     }
     std::cout << "HASHTAG: #" << hastag << std:: endl;
