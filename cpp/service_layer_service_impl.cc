@@ -121,8 +121,6 @@ grpc::Status ServiceLayerServiceImpl::stream(
     }
     if (context->IsCancelled()) {
       keep_streaming = false;
-      // TODO: delete hashtag chirps
-      // TODO: delete from hashtag list of users
       service_.endstream(request->hashtag(), request->username());
     }
   }

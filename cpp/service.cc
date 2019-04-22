@@ -237,8 +237,7 @@ std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username,
   return found_chirps;
 }
 
-std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag,
-                                               const std::string& username) {
+std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag, const std::string& username) {
   std::lock_guard<std::mutex> lock(*service_mtx_);
   std::deque<chirp::Chirp> found_chirps;
   // check if username exists
@@ -250,13 +249,11 @@ std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag,
     found_chirps.push_back(error_chirp);
     return found_chirps;
   }
-
   // retrieve all hashtag chirps
   const std::string hashtag_key = kuserHashtag_ + username + kdivideUserHashtag_ + hashtag;
   const std::deque<std::string>& hashtag_chirps = store_->get(hashtag_key);
   for (const std::string& id : hashtag_chirps) {
-    std::deque<std::string> this_chirps_values =
-        store_->get(kchirpValue_ + id);
+    std::deque<std::string> this_chirps_values = store_->get(kchirpValue_ + id);
     chirp::Chirp thisChirp;
     if (this_chirps_values.size() > 0) {
       thisChirp.ParseFromString(this_chirps_values.at(0));
