@@ -1,7 +1,6 @@
 #include "service.h"
 
 ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection) {
-  service_sema = new std::mutex;
   store_ = key_value_connection;
   const std::deque<std::string>& chirp_count = store_->get("chirp_count");
   if (chirp_count.size() == 0) {
@@ -59,7 +58,6 @@ chirp::Chirp ServiceLayer::chirpConstructionHelper(
 chirp::Chirp ServiceLayer::chirp(const std::string& username,
                                  const std::string& text,
                                  const std::string& parent_id) {
-  std::lock_guard<std::mutex> lock(*service_sema);
   if (parent_id.length() > 0) {
     const std::string this_chirp_parent_key = kchirpValue_ + parent_id;
     const std::deque<std::string>& this_chirps_values =
@@ -236,17 +234,6 @@ std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username,
 }
 
 std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag) {
-  std::lock_guard<std::mutex> lock(*service_sema);
-  // get initial_time in which hashtags are requested
-  chirp::Timestamp start;
-  std::chrono::seconds current_time_seconds =
-      std::chrono::duration_cast<std::chrono::seconds>(
-          std::chrono::system_clock::now().time_since_epoch());
-  std::chrono::microseconds current_time_useconds =
-      std::chrono::duration_cast<std::chrono::microseconds>(
-          std::chrono::system_clock::now().time_since_epoch());
-  start.set_seconds(current_time_seconds.count());
-  start.set_useconds(current_time_useconds.count());
   // TODO: check if username exists
   std::deque<chirp::Chirp> found_chirps;
   const std::string hashtag_key = khashtag_ + hashtag;
