@@ -247,7 +247,6 @@ std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag,
 
   // retrieve all hashtag chirps
   const std::string hashtag_key = kuserHashtag_ + username + kdivideUserHashtag_ + hashtag;
-  std::cout << "ServiceLayer::stream hashtag_key: " << hashtag_key << std::endl;
   const std::deque<std::string>& hashtag_chirps = store_->get(hashtag_key);
   for (const std::string& id : hashtag_chirps) {
     std::deque<std::string> this_chirps_values =
