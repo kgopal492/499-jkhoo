@@ -25,5 +25,6 @@ class KeyValueStore : public KeyValueClientInterface {
   // Map to store the keys and values of the KeyValueStoreServiceImpl
   std::map<std::string, std::deque<std::string>> store_;
   // Protects store_
+  std::mutex store_mut_;
 };
 #endif

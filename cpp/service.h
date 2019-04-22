@@ -62,7 +62,5 @@ class ServiceLayer final {
   const std::string kchirpReplies_ = "3";
   // constant for the key that holds the hashtags that are being followed
   const std::string khashtag_ = "4";
-  // mutex to prevent race conditions within chirps being added and broadcast
-  std::mutex service_mut_;
 };
 #endif
