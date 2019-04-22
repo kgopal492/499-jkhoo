@@ -132,7 +132,6 @@ grpc::Status ServiceLayerServiceImpl::stream(
     if (context->IsCancelled()) {
       keep_streaming = false;
     }
-    usleep(20);
   }
   return grpc::Status::OK;
 }
