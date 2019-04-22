@@ -1,6 +1,7 @@
 #include "service.h"
 
 ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection) {
+  service_mtx_ = new std::mutex();
   store_ = key_value_connection;
   const std::deque<std::string>& chirp_count = store_->get("chirp_count");
   if (chirp_count.size() == 0) {
@@ -8,6 +9,7 @@ ServiceLayer::ServiceLayer(KeyValueClientInterface* key_value_connection) {
   }
 }
 bool ServiceLayer::registeruser(const std::string& username) {
+  std::lock_guard<std::mutex> lock(*service_mtx_);
   if (username.length() == 0) {
     return false;
   }
@@ -58,6 +60,7 @@ chirp::Chirp ServiceLayer::chirpConstructionHelper(
 chirp::Chirp ServiceLayer::chirp(const std::string& username,
                                  const std::string& text,
                                  const std::string& parent_id) {
+  std::lock_guard<std::mutex> lock(*service_mtx_);
   if (parent_id.length() > 0) {
     const std::string this_chirp_parent_key = kchirpValue_ + parent_id;
     const std::deque<std::string>& this_chirps_values =
@@ -144,6 +147,7 @@ void ServiceLayer::storeHashtags(const std::string& text, const std::string& chi
 
 bool ServiceLayer::follow(const std::string& username,
                           const std::string& to_follow) {
+  std::lock_guard<std::mutex> lock(*service_mtx_);
   if (username == to_follow) {
     return false;
   }
@@ -164,6 +168,7 @@ bool ServiceLayer::follow(const std::string& username,
 }
 
 std::deque<chirp::Chirp> ServiceLayer::read(const std::string& chirp_id) {
+  std::lock_guard<std::mutex> lock(*service_mtx_);
   std::deque<chirp::Chirp> read_chirps;
 
   // Stores chirps to read
@@ -204,6 +209,7 @@ std::deque<chirp::Chirp> ServiceLayer::read(const std::string& chirp_id) {
 
 std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username,
                                                chirp::Timestamp start) {
+  std::lock_guard<std::mutex> lock(*service_mtx_);
   std::deque<chirp::Chirp> found_chirps;
   const std::string user_following_key = kuserFollowing_ + username;
   const std::deque<std::string>& user_following =
@@ -233,7 +239,7 @@ std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username,
 
 std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag,
                                                const std::string& username) {
-
+  std::lock_guard<std::mutex> lock(*service_mtx_);
   std::deque<chirp::Chirp> found_chirps;
   // check if username exists
   const std::string this_user_key = kuserChirps_ + username;
@@ -263,6 +269,7 @@ std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag,
 }
 
 void ServiceLayer::endstream(const std::string& hashtag, const std::string& username) {
+  std::lock_guard<std::mutex> lock(*service_mtx_);
   const std::string hashtag_key = kuserHashtag_ + username + kdivideUserHashtag_ + hashtag;
   store_->deletekey(hashtag_key);
   std::deque<std::string> remaining_streamers;
@@ -279,6 +286,7 @@ void ServiceLayer::endstream(const std::string& hashtag, const std::string& user
 }
 
 bool ServiceLayer::beginstream(const std::string& hashtag, const std::string& username) {
+  std::lock_guard<std::mutex> lock(*service_mtx_);
   store_->put(khashtagStreamers_ + hashtag, username);
   return true; // TODO: return false if username or hashtag invalid
 }

@@ -76,5 +76,7 @@ class ServiceLayer final {
   // constant to separate user and hashtag to create userHashtag key
   // TODO: add test in register to make sure username does not contain this string
   const std::string kdivideUserHashtag_ = "::";
+  // service mutex to prevent race conditions between functions
+  std::mutex* service_mtx_;
 };
 #endif
