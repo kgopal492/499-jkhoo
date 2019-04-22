@@ -121,25 +121,23 @@ void ServiceLayer::storeHashtags(const std::string& text, const std::string& chi
       temp_text = temp_text.substr(temp_text.length());
     }
     if (hashtag.length() != 0) {
-      const std::string hashtag_key = khashtag_ + hashtag;
-      const std::deque<std::string>& hashtag_chirp_ids = store_->get(hashtag_key);
+      std::deque<std::string> hashtag_streamers = store_->get(khashtagStreamers_ + hashtag);
       bool chirp_added = false;
-      for (std::string curr_hash_chirp_id : hashtag_chirp_ids) {
-        if(curr_hash_chirp_id == chirp_id) {
-          chirp_added = true;
-          break;
+      for (std::string streamer : hashtag_streamers) {
+        const std::string hashtag_key = kuserHashtag_ + username + kdivideUserHashtag_ + hashtag;
+        const std::deque<std::string> hashtag_chirp_ids = store_->get(hashtag_key);
+        chirp_added = false;
+        for (std::string hashtag_chirp_id : hashtag_chirp_ids) {
+          if(hashtag_chirp_id == chirp_id) {
+            chirp_added = true;
+            break;
+          }
         }
-      }
-      if (!chirp_added) {
-        std::cout << "putting hashtag in kvs: " << hashtag << std:: endl;
-        store_->put(hashtag_key, chirp_id);
-        std::deque<std::string> chirp_ids = store_->get(hashtag_key);
-        for(std::string id : chirp_ids) {
-          std::cout << "Curr chirp id: " << id << std::endl;
+        if(!chirp_added) {
+          store_->put(hashtag_key, chirp_id);
         }
       }
     }
-    std::cout << "HASHTAG: #" << hashtag << std:: endl;
     hash_index = temp_text.find("#");
   }
 }
@@ -234,23 +232,47 @@ std::deque<chirp::Chirp> ServiceLayer::monitor(const std::string& username,
 }
 
 std::deque<chirp::Chirp> ServiceLayer::stream(const std::string& hashtag,
-                                               chirp::Timestamp start) {
-  // TODO: check if username exists
+                                               const std::string& username) {
+
   std::deque<chirp::Chirp> found_chirps;
-  const std::string hashtag_key = khashtag_ + hashtag;
-  const std::deque<std::string>& hashtag_chirps =
-      store_->get(hashtag_key);
+
+  // check if username exists
+  const std::string this_user_key = kuserChirps_ + username;
+  const std::deque<std::string>& this_user_info = store_->get(this_user_key);
+  if (this_user_info.size() == 0) {
+    chirp::Chirp error_chirp;
+    error_chirp.set_id("ERROR");
+    found_chirps.push_back(error_chirp);
+    return found_chirps;
+  }
+
+  // retrieve all hashtag chirps
+  const std::string hashtag_key = kuserHashtag_ + username + kdivideUserHashtag_ + hashtag;
+  const std::deque<std::string>& hashtag_chirps = store_->get(hashtag_key);
   for (const std::string& id : hashtag_chirps) {
     std::deque<std::string> this_chirps_values =
         store_->get(kchirpValue_ + id);
     chirp::Chirp thisChirp;
     if (this_chirps_values.size() > 0) {
       thisChirp.ParseFromString(this_chirps_values.at(0));
-      if (thisChirp.timestamp().useconds() > start.useconds()) {
-        found_chirps.push_back(thisChirp);
-      }
+      found_chirps.push_back(thisChirp);
     }
   }
-
+  store_->delete(hashtag_key);
   return found_chirps;
+}
+
+void ServiceLayer::endstream(const std::string& hashtag,
+                                               const std::string& username) {
+  const std::string hashtag_key = kuserHashtag_ + username + kdivideUserHashtag_ + hashtag;
+  store_->delete(hashtag_key);
+  std::deque<std::string> remaining_streamers;
+  std::deque<std::string> hashtag_streamers = store_->get(khashtagStreamers_ + hashtag);
+  for (std::string streamer : hashtag_streamers) {
+    if (streamer != username) {
+      remaining_streamers.push_back(streamer);
+    }
+  }
+  store_->delete(khashtagStreamers_ + hashtag, remaining_streamers);
+  store_->put()
 }
