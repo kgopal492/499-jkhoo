@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
     logged_in_action_needed = false;
   }
   if (FLAGS_stream != "" && my_username != "") {
-    client.stream(FLAGS_stream, stub_);
+    client.stream(FLAGS_stream, my_username, stub_);
     logged_in_action_needed = false;
   }
   if (logged_in_action_needed) {

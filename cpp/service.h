@@ -38,8 +38,12 @@ class ServiceLayer final {
   // Communicates with KeyValueStoreServiceImpl to stream chirps from the users
   // username is following by returning a deque of chirps created after start
   // time
-  std::deque<chirp::Chirp> stream(const std::string& hashtag,
-                                   chirp::Timestamp start);
+  std::deque<chirp::Chirp> stream(const std::string& hashtag, const std::string& username);
+  // Deletes relevant keys and values to end collection of chirps when a user
+  // is done streaming a hashtag
+  void endstream(const std::string& hashtag, const std::string& username);
+  // Adds user to streaming queue for a specific hashtag
+  bool beginstream(const std::string& hashtag, const std::string& username);
 
  private:
   // helper function for chirp to create a Chirp message with the given
@@ -61,7 +65,14 @@ class ServiceLayer final {
   const std::string kchirpValue_ = "2";
   // constant for the key that holds the ids of a chirp's replies
   const std::string kchirpReplies_ = "3";
-  // constant for the key that holds the hashtags that are being followed
-  const std::string khashtag_ = "4";
+  // constant that stores strings of usernames that follow given hashtag
+  const std::string khashtagStreamers_ = "4";
+  // constant that stores chirp ids to be streamed for a given user and hashtag
+  const std::string kuserHashtag_ = "5";
+  // constant to separate user and hashtag to create userHashtag key
+  // TODO: add test in register to make sure username does not contain this string
+  const std::string kdivideUserHashtag_ = "::";
+  // service mutex to prevent race conditions between functions
+  std::mutex* service_mtx_;
 };
 #endif
