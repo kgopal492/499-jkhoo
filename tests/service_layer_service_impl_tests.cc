@@ -192,7 +192,7 @@ TEST(StreamTest, CheckHashtagUser) {
 
   // tests valid hashtag & user returns true (tests beginstream)
   service_layer.registeruser(kvalidUsername);
-  bool valid_hashtag_user = service_layer.beginstream(kvalidHashtag, kinvalidUsername, start_time);
+  bool valid_hashtag_user = service_layer.beginstream(kvalidHashtag, kvalidUsername, start_time);
   ASSERT_EQ(true, valid_hashtag_user);
 }
 
@@ -242,8 +242,8 @@ TEST(StreamTest, MultipleStreamHashtag) {
   chirp::Timestamp start_time;
   std::chrono::seconds seconds_since_start1 = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch());
   std::chrono::microseconds useconds_since_start1 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
-  start_time_user1.set_seconds(seconds_since_start1.count());
-  start_time_user1.set_useconds(useconds_since_start1.count());
+  start_time.set_seconds(seconds_since_start1.count());
+  start_time.set_useconds(useconds_since_start1.count());
   service_layer.beginstream(kvalidHashtag, kmultipleUser1, start_time);
   service_layer.beginstream(kvalidHashtag, kmultipleUser2, start_time);
   service_layer.chirp(kchirper, kvalidChirpText, "");
@@ -255,7 +255,7 @@ TEST(StreamTest, MultipleStreamHashtag) {
   ASSERT_EQ(kvalidChirpText, chirp_results2[0].text());
 }
 
-TEST(StreamTest, MultipleStreamHashtag) {
+TEST(StreamTest, SameUserStreamTwice) {
   KeyValueStore test_store;
   ServiceLayer service_layer(&test_store);
   const std::string ksameUser = "Krishna";
@@ -269,12 +269,8 @@ TEST(StreamTest, MultipleStreamHashtag) {
   std::chrono::microseconds useconds_since_start1 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
   start_time_user1.set_seconds(seconds_since_start1.count());
   start_time_user1.set_useconds(useconds_since_start1.count());
-  chirp::Timestamp start_time_user2;
-  std::chrono::seconds seconds_since_start2 = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch());
-  std::chrono::microseconds useconds_since_start2 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
-  start_time_user2.set_seconds(seconds_since_start2.count());
-  start_time_user2.set_useconds(useconds_since_start2.count());
-
+  chirp::Timestamp start_time_user2 = start_time_user1;
+  start_time_user2.set_useconds(useconds_since_start1.count()+1);
   service_layer.beginstream(kvalidHashtag, ksameUser, start_time_user1);
   service_layer.beginstream(kvalidHashtag, ksameUser, start_time_user2);
   service_layer.chirp(kchirper, kvalidChirpText, "");
