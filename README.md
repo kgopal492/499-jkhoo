@@ -54,7 +54,8 @@ Run the client layer with `./client_layer` and any appropriate flags
 `./client_layer --user <username> --chirp <text> --reply <parent_id>` creates a new chirp by the user with the given text as a reply to the chirp with the given parent_id  
 `./client_layer --user <username> --follow <to_follow>` username starts following to_follow  
 `./client_layer --user <username> --read <chirp_id>` reads the chirp thread starting at the given id  
-`./client_layer --user <username> --monitor` streams new chirps from those currently followed  
+`./client_layer --user <username> --monitor` monitors new chirps from those currently followed  
+`./client_layer --user <username> --stream <hashtag>` streams new hashtags from any other user (note: hashtag passed to the command line does NOT contain '#' symbol)
 
 ## 3. Compiling and running the tests  
 Go to 499-jkhoo/tests and run `./test_compile_clean`  
@@ -62,3 +63,6 @@ Run the key value store tests with `./key_value_store_service_impl_tests`
 Run the service layer tests with `./service_layer_service_impl_tests`
 
 ## 4. Notes on implementation
+* --stream is takes string *without* '#' symbol
+* --stream does not take any hashtag containing a blank space ' ' character, even if it is at the beginning or end of the string
+* 

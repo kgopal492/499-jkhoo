@@ -167,6 +167,86 @@ TEST(ChirpTest, InvalidParent) {
   ASSERT_EQ("ERROR", generated_chirp.id());
 }
 
+// Tests whether hashtag and username added to stream are valid
+TEST(StreamTest, CheckHashtagUser) {
+  KeyValueStore test_store;
+  ServiceLayer service_layer(&test_store);
+
+  const std::string kvalidUsername = "Krishna";
+  const std::string kinvalidUsername = "Jill";
+  const std::string kvalidHashtag = "499isgreat";
+  const std::string kinvalidHashtag = "499 is great";
+  chirp::Timestamp start_time;
+  std::chrono::seconds seconds_since_start = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch());
+  std::chrono::microseconds useconds_since_start = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
+  start_time.set_seconds(seconds_since_start.count());
+  start_time.set_useconds(useconds_since_start.count());
+
+  // tests invalid hashtag returns false (tests beginstream)
+  bool valid_hashtag = service_layer.beginstream(kinvalidHashtag, kvalidUsername, start_time);
+  ASSERT_EQ(false, valid_hashtag);
+
+  // tests invalid user returns false (tests beginstream)
+  bool valid_user = service_layer.beginstream(kvalidHashtag, kinvalidUsername, start_time);
+  ASSERT_EQ(false, valid_user);
+
+  // tests valid hashtag & user returns true (tests beginstream)
+  service_layer.registeruser(valid_user);
+  bool valid_hashtag_user = service_layer.beginstream(kvalidHashtag, kinvalidUsername, start_time);
+  ASSERT_EQ(true, valid_hashtag_user);
+}
+
+// Tests Stream from client end, ensuring that hashtags appropriately sent to single streamer
+TEST(StreamTest, SingleUserValidHashtag) {
+  KeyValueStore test_store;
+  ServiceLayer service_layer(&test_store);
+
+  const std::string kvalidChirper = "Krishna";
+  const std::string kvalidUsername = "Jill";
+  const std::string klateStreamer = "Barath";
+  const std::string kvalidHashtag = "499isgreat";
+  const std::string kvalidChirpText = "Hey guys, I just wanted to let you know that #499isgreat";
+  service_layer.registeruser(kvalidChirper);
+  service_layer.registeruser(kvalidUsername);
+  service_layer.registeruser(klateStreamer);
+  chirp::Timestamp start_time;
+  std::chrono::seconds seconds_since_start = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch());
+  std::chrono::microseconds useconds_since_start = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
+  start_time.set_seconds(seconds_since_start.count());
+  start_time.set_useconds(useconds_since_start.count());
+
+  // tests valid instance, hashtag chirped after user streams hashtags is sent to user
+  service_layer.beginstream(kvalidHashtag, kinvalidUsername, start_time);
+  service_layer.chirp(kvalidChirper, kvalidChirpText, "");
+  std::deque<chirp::Chirp> chirp_results = service_layer.stream(kvalidHashtag, kvalidUsername, start_time);
+  EXPECT_EQ(1, chirp_results.size());
+  ASSERT_EQ(kvalidChirpText, chirp_results[0].text();
+
+  // tests hashtags chirped before stream begins are not added to stream
+  service_layer.beginstream(kvalidHashtag, klateStreamer, start_time);
+  std::deque<chirp::Chirp> late_chirp_results = service_layer.stream(kvalidHashtag, klateStreamer, start_time);
+  ASSERT_EQ(0, late_chirp_results.size());
+}
+
+TEST(StreamTest, MultipleStreamHashtag) {
+  // Multiple different users can stream same hashtag and should receive same chirps
+
+  // The same user can stream the same hashtag separately and should receive same chirps
+}
+
+TEST(StreamTest, ValidHashtagParsing) {
+  // hashtag correctly terminated by space in middle of string
+  // hashtag starting at beginning of string correctly added
+  // hashtag terminated by null character correctly added
+  // hashtag length of zero should not be added
+  // multiple different hashtags in chirp are all added to appropriate streamers
+  // hashtag multiple times in chirp should only be printed once by streamer
+}
+
+TEST(StreamTest, EndStream) {
+  // hashtag added after a user stops streaming is not listed when the user begins streaming once again
+}
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
