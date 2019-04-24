@@ -191,7 +191,7 @@ TEST(StreamTest, CheckHashtagUser) {
   ASSERT_EQ(false, valid_user);
 
   // tests valid hashtag & user returns true (tests beginstream)
-  service_layer.registeruser(valid_user);
+  service_layer.registeruser(kvalidUsername);
   bool valid_hashtag_user = service_layer.beginstream(kvalidHashtag, kinvalidUsername, start_time);
   ASSERT_EQ(true, valid_hashtag_user);
 }
@@ -216,7 +216,7 @@ TEST(StreamTest, SingleUserValidHashtag) {
   start_time.set_useconds(useconds_since_start.count());
 
   // tests valid instance, hashtag chirped after user streams hashtags is sent to user
-  service_layer.beginstream(kvalidHashtag, kinvalidUsername, start_time);
+  service_layer.beginstream(kvalidHashtag, kvalidUsername, start_time);
   service_layer.chirp(kvalidChirper, kvalidChirpText, "");
   std::deque<chirp::Chirp> chirp_results = service_layer.stream(kvalidHashtag, kvalidUsername, start_time);
   EXPECT_EQ(1, chirp_results.size());
