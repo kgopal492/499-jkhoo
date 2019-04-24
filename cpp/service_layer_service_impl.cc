@@ -101,9 +101,12 @@ grpc::Status ServiceLayerServiceImpl::stream(
   std::set<std::string> read_chirps;
   bool keep_streaming = true;
   std::deque<chirp::Chirp> found_chirps;
-  service_.beginstream(request->hashtag(), request->username());
+  chirp::Timestamp start_time;
+  start_time.set_seconds(seconds.count());
+  start_time.set_useconds(useconds.count());
+  service_.beginstream(request->hashtag(), request->username(), start_time);
   while (keep_streaming) {
-    found_chirps = service_.stream(request->hashtag(), request->username());
+    found_chirps = service_.stream(request->hashtag(), request->username(), start_time);
     for (const chirp::Chirp c : found_chirps) {
       if(c.id() == "ERROR") {
         keep_streaming = false;
@@ -121,7 +124,7 @@ grpc::Status ServiceLayerServiceImpl::stream(
     }
     if (context->IsCancelled()) {
       keep_streaming = false;
-      service_.endstream(request->hashtag(), request->username());
+      service_.endstream(request->hashtag(), request->username(), start_time);
     }
   }
   return grpc::Status::OK;

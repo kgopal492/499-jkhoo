@@ -167,7 +167,6 @@ TEST(ChirpTest, InvalidParent) {
   ASSERT_EQ("ERROR", generated_chirp.id());
 }
 
-
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
