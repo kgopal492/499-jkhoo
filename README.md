@@ -1,6 +1,12 @@
-# Jillian Khoo - jkhoo@usc.edu
+# Chirp Phase 3
+*Forked from [jillianKhoo/499-jkhoo](https://github.com/jillianKhoo/499-jkhoo).*
+## Contents
+1. [Installation](##1.-installation)
+2. [Compiling and Running the Code](##2.-compiling-and-running-the-code)
+3. [Compiling and Running the Tests](##3.-compiling-and-running-the-tests)
+4. [Notes on Implementation](##4.-notes-on-implementation)
 
-## Installation
+## 1. Installation
 ### Initial Setup:
 #### Download vagrant here:  
 https://www.vagrantup.com/downloads.html
@@ -36,7 +42,7 @@ sudo cmake CMakeLists.txt
 sudo make
 sudo cp *.a /usr/lib`  
 
-## Compiling and running the code:  
+## 2. Compiling and running the code  
 Go to 499-jkhoo/cpp and run `./compile_clean` to compile everything except tests  
 Start the Key Value store with `./backend_store`  
 Start the Service Layer with `./service_layer`  
@@ -50,7 +56,9 @@ Run the client layer with `./client_layer` and any appropriate flags
 `./client_layer --user <username> --read <chirp_id>` reads the chirp thread starting at the given id  
 `./client_layer --user <username> --monitor` streams new chirps from those currently followed  
 
-## Compiling and running the tests:  
+## 3. Compiling and running the tests  
 Go to 499-jkhoo/tests and run `./test_compile_clean`  
 Run the key value store tests with `./key_value_store_service_impl_tests`  
 Run the service layer tests with `./service_layer_service_impl_tests`
+
+## 4. Notes on implementation
