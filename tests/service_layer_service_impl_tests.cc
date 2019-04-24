@@ -219,8 +219,8 @@ TEST(StreamTest, SingleUserValidHashtag) {
   service_layer.beginstream(kvalidHashtag, kvalidUsername, start_time);
   service_layer.chirp(kvalidChirper, kvalidChirpText, "");
   std::deque<chirp::Chirp> chirp_results = service_layer.stream(kvalidHashtag, kvalidUsername, start_time);
-  EXPECT_EQ(1, chirp_results.size());
-  ASSERT_EQ(kvalidChirpText, chirp_results[0].text();
+  ASSERT_EQ(1, chirp_results.size());
+  ASSERT_EQ(kvalidChirpText, chirp_results[0].text());
 
   // tests hashtags chirped before stream begins are not added to stream
   service_layer.beginstream(kvalidHashtag, klateStreamer, start_time);
@@ -229,9 +229,50 @@ TEST(StreamTest, SingleUserValidHashtag) {
 }
 
 TEST(StreamTest, MultipleStreamHashtag) {
+  KeyValueStore test_store;
+  ServiceLayer service_layer(&test_store);
+
+  const std::string ksameUser = "Krishna";
+  const std::string kmultipleUser1 = "Jill";
+  const std::string kmultipleUser2 = "Barath";
+  const std::string kvalidHashtag = "499isgreat";
+  const std::string kvalidChirpText = "Hey guys, I just wanted to let you know that #499isgreat";
+  service_layer.registeruser(kvalidChirper);
+  service_layer.registeruser(kvalidUsername);
+  service_layer.registeruser(klateStreamer);
   // Multiple different users can stream same hashtag and should receive same chirps
+  chirp::Timestamp start_time_user1;
+  std::chrono::seconds seconds_since_start1 = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch());
+  std::chrono::microseconds useconds_since_start1 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
+  start_time_user1.set_seconds(seconds_since_start1.count());
+  start_time_user1.set_useconds(useconds_since_start1.count());
+
+  chirp::Timestamp start_time_user2;
+  std::chrono::seconds seconds_since_start2 = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch());
+  std::chrono::microseconds useconds_since_start2 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
+  start_time_user2.set_seconds(seconds_since_start2.count());
+  start_time_user2.set_useconds(useconds_since_start2.count());
+
+  service_layer.beginstream(kvalidHashtag, kmultipleUser1, start_time_user1);
+  service_layer.beginstream(kvalidHashtag, kmultipleUser2, start_time_user2);
+  service_layer.chirp(ksameUser, kvalidChirpText, "");
+  std::deque<chirp::Chirp> chirp_results1 = service_layer.stream(kvalidHashtag, kmultipleUser1, start_time_user1);
+  ASSERT_EQ(1, chirp_results1.size());
+  ASSERT_EQ(kvalidChirpText, chirp_results1[0].text());
+  std::deque<chirp::Chirp> chirp_results2 = service_layer.stream(kvalidHashtag, kmultipleUser2, start_time_user2);
+  ASSERT_EQ(1, chirp_results2.size());
+  ASSERT_EQ(kvalidChirpText, chirp_results2[0].text());
 
   // The same user can stream the same hashtag separately and should receive same chirps
+  service_layer.beginstream(kvalidHashtag, ksameUser, start_time_user1);
+  service_layer.beginstream(kvalidHashtag, ksameUser, start_time_user2);
+  service_layer.chirp(kmultipleUser1, kvalidChirpText, "");
+  std::deque<chirp::Chirp> chirp_results1 = service_layer.stream(kvalidHashtag, ksameUser, start_time_user1);
+  ASSERT_EQ(1, chirp_results1.size());
+  ASSERT_EQ(kvalidChirpText, chirp_results1[0].text());
+  std::deque<chirp::Chirp> chirp_results2 = service_layer.stream(kvalidHashtag, ksameUser, start_time_user2);
+  ASSERT_EQ(1, chirp_results2.size());
+  ASSERT_EQ(kvalidChirpText, chirp_results2[0].text());
 }
 
 TEST(StreamTest, ValidHashtagParsing) {
