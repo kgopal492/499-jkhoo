@@ -101,14 +101,21 @@ grpc::Status ServiceLayerServiceImpl::stream(
   std::set<std::string> read_chirps;
   bool keep_streaming = true;
   std::deque<chirp::Chirp> found_chirps;
-  service_.beginstream(request->hashtag(), request->username());
+  std::chrono::seconds seconds_since_start =
+      std::chrono::duration_cast<std::chrono::seconds>(
+          std::chrono::system_clock::now().time_since_epoch());
+  std::chrono::microseconds useconds_since_start =
+      std::chrono::duration_cast<std::chrono::microseconds>(
+          std::chrono::system_clock::now().time_since_epoch());
+  chirp::Timestamp start_time;
+  start_time.set_seconds(seconds_since_start.count());
+  start_time.set_useconds(useconds_since_start.count());
+  if(!service_.beginstream(request->hashtag(), request->username(), start_time)) {
+    return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT, "Username or hashtag invalid.");
+  }
   while (keep_streaming) {
-    found_chirps = service_.stream(request->hashtag(), request->username());
+    found_chirps = service_.stream(request->hashtag(), request->username(), start_time);
     for (const chirp::Chirp c : found_chirps) {
-      if(c.id() == "ERROR") {
-        keep_streaming = false;
-        return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT, "Username does not exist");
-      }
       if (read_chirps.find(c.id()) == read_chirps.end()) {
         chirp::Chirp* this_chirp = new chirp::Chirp();
         this_chirp->CopyFrom(c);
@@ -121,7 +128,7 @@ grpc::Status ServiceLayerServiceImpl::stream(
     }
     if (context->IsCancelled()) {
       keep_streaming = false;
-      service_.endstream(request->hashtag(), request->username());
+      service_.endstream(request->hashtag(), request->username(), start_time);
     }
   }
   return grpc::Status::OK;

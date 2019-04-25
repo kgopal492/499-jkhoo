@@ -38,12 +38,12 @@ class ServiceLayer final {
   // Communicates with KeyValueStoreServiceImpl to stream chirps from the users
   // username is following by returning a deque of chirps created after start
   // time
-  std::deque<chirp::Chirp> stream(const std::string& hashtag, const std::string& username);
+  std::deque<chirp::Chirp> stream(const std::string& hashtag, const std::string& username, const chirp::Timestamp& start);
   // Deletes relevant keys and values to end collection of chirps when a user
   // is done streaming a hashtag
-  void endstream(const std::string& hashtag, const std::string& username);
+  void endstream(const std::string& hashtag, const std::string& username, const chirp::Timestamp& start);
   // Adds user to streaming queue for a specific hashtag
-  bool beginstream(const std::string& hashtag, const std::string& username);
+  bool beginstream(const std::string& hashtag, const std::string& username, const chirp::Timestamp& start);
 
  private:
   // helper function for chirp to create a Chirp message with the given

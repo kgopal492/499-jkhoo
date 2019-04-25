@@ -109,13 +109,18 @@ void Client::stream(std::string hashtag, std::string username,
   std::unique_ptr<grpc::ClientReader<chirp::StreamReply> > stream_handle(
       stub_->stream(&context, request));
   // continues requesting chirps until program is quit
-  // and connection is closed
-  while (true) {
+  // and connection is closed or if invalid username or hashtag is entered
+  bool keep_streaming = true;
+  while (keep_streaming) {
     chirp::Chirp this_chirp;
     while (stream_handle->Read(&reply)) {
       this_chirp = reply.chirp();
       std::cout << this_chirp.username() << ": " << this_chirp.text()
                 << std::endl;
+    }
+    if(stream_handle->Finish().error_code() != 0) {
+      std::cout << "Invalid username or hashtag for stream" << std::endl;
+      keep_streaming = false;
     }
   }
 }
