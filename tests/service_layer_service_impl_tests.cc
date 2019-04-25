@@ -171,7 +171,6 @@ TEST(ChirpTest, InvalidParent) {
 TEST(StreamTest, CheckHashtagUser) {
   KeyValueStore test_store;
   ServiceLayer service_layer(&test_store);
-
   const std::string kvalidUsername = "Krishna";
   const std::string kinvalidUsername = "Jill";
   const std::string kvalidHashtag = "499isgreat";
@@ -200,7 +199,6 @@ TEST(StreamTest, CheckHashtagUser) {
 TEST(StreamTest, SingleUserValidHashtag) {
   KeyValueStore test_store;
   ServiceLayer service_layer(&test_store);
-
   const std::string kvalidChirper = "Krishna";
   const std::string kvalidUsername = "Jill";
   const std::string klateStreamer = "Barath";
@@ -228,6 +226,7 @@ TEST(StreamTest, SingleUserValidHashtag) {
   ASSERT_EQ(0, late_chirp_results.size());
 }
 
+// Tests whether multiple different users can stream the same hashtag simultaneously
 TEST(StreamTest, MultipleStreamHashtag) {
   KeyValueStore test_store;
   ServiceLayer service_layer(&test_store);
@@ -255,6 +254,7 @@ TEST(StreamTest, MultipleStreamHashtag) {
   ASSERT_EQ(kvalidChirpText, chirp_results2[0].text());
 }
 
+// Tests whether multiple instances of the same user can stream the same hashtag simultaneously
 TEST(StreamTest, SameUserStreamTwice) {
   KeyValueStore test_store;
   ServiceLayer service_layer(&test_store);
@@ -282,17 +282,88 @@ TEST(StreamTest, SameUserStreamTwice) {
   ASSERT_EQ(kvalidChirpText, chirp_results2[0].text());
 }
 
+// Tests different cases of hashtag parsing to determine validity
 TEST(StreamTest, ValidHashtagParsing) {
+  KeyValueStore test_store;
+  ServiceLayer service_layer(&test_store);
+  const std::string kStreamerFightOn = "Krishna";
+  const std::string kStreamerTrojanFamily = "Jill";
+  const std::string kChirper = "Barath";
+  const std::string khashtagFightOn = "fighton";
+  const std::string khashtagTrojanFamily = "trojanfamily";
+  const std::string kvalidHashtagEndBySpace = "I #fighton every day.";
+  const std::string kvalidHashtagAtStart = "#fighton Trojan buddies!!!";
+  const std::string kvalidHashtagEndByNull = "My motto is #fighton";
+  const std::string kvalidTwoHashtags = "I like to #fighton with my #trojanfamily";
+  const std::string kvalidHashtagMultipleTimes = "#fighton #fighton #fighton";
+  chirp::Timestamp start_time;
+  std::chrono::seconds seconds_since_start = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch());
+  std::chrono::microseconds useconds_since_start = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
+  start_time.set_seconds(seconds_since_start.count());
+  start_time.set_useconds(useconds_since_start.count());
+  service_layer.registeruser(kStreamerFightOn);
+  service_layer.registeruser(kStreamerTrojanFamily);
+  service_layer.registeruser(kChirper);
+  service_layer.beginstream(khashtagFightOn, kStreamerFightOn, start_time);
+  service_layer.beginstream(khashtagTrojanFamily, kStreamerTrojanFamily, start_time);
+
   // hashtag correctly terminated by space in middle of string
+  service_layer.chirp(kChirper, kvalidHashtagEndBySpace, "");
+  std::deque<chirp::Chirp> chirp_results = service_layer.stream(khashtagFightOn, kStreamerFightOn, start_time);
+  ASSERT_EQ(1, chirp_results.size());
+  ASSERT_EQ(kvalidHashtagEndBySpace, chirp_results[0].text());
+
   // hashtag starting at beginning of string correctly added
+  service_layer.chirp(kChirper, kvalidHashtagAtStart, "");
+  chirp_results = service_layer.stream(khashtagFightOn, kStreamerFightOn, start_time);
+  ASSERT_EQ(1, chirp_results.size());
+  ASSERT_EQ(kvalidHashtagAtStart, chirp_results[0].text());
+
   // hashtag terminated by null character correctly added
-  // hashtag length of zero should not be added
+  service_layer.chirp(kChirper, kvalidHashtagEndByNull, "");
+  chirp_results = service_layer.stream(khashtagFightOn, kStreamerFightOn, start_time);
+  ASSERT_EQ(1, chirp_results.size());
+  ASSERT_EQ(kvalidHashtagEndByNull, chirp_results[0].text());
+
   // multiple different hashtags in chirp are all added to appropriate streamers
+  service_layer.chirp(kChirper, kvalidTwoHashtags, "");
+  chirp_results = service_layer.stream(khashtagFightOn, kStreamerFightOn, start_time);
+  ASSERT_EQ(1, chirp_results.size());
+  ASSERT_EQ(kvalidTwoHashtags, chirp_results[0].text());
+  std::deque<chirp::Chirp> chirp_results2 = service_layer.stream(khashtagTrojanFamily, kStreamerTrojanFamily, start_time);
+  ASSERT_EQ(1, chirp_results.size());
+  ASSERT_EQ(kvalidTwoHashtags, chirp_results[0].text());
+
   // hashtag multiple times in chirp should only be printed once by streamer
+  service_layer.chirp(kChirper, kvalidHashtagMultipleTimes, "");
+  chirp_results = service_layer.stream(khashtagFightOn, kStreamerFightOn, start_time);
+  ASSERT_EQ(1, chirp_results.size());
+  ASSERT_EQ(kvalidHashtagMultipleTimes, chirp_results[0].text());
 }
 
+// hashtag added after a user stops streaming is not listed when the user begins streaming once again
 TEST(StreamTest, EndStream) {
-  // hashtag added after a user stops streaming is not listed when the user begins streaming once again
+  KeyValueStore test_store;
+  ServiceLayer service_layer(&test_store);
+  const std::string kvalidChirper = "Krishna";
+  const std::string kvalidStreamer = "Jill";
+  const std::string kvalidHashtag = "499isgreat";
+  const std::string kvalidChirpText1 = "Hey guys, I just wanted to let you know that #499isgreat";
+  const std::string kvalidChirpText2 = "I also wanted to mention once again that #499isgreat";
+  service_layer.registeruser(kvalidChirper);
+  service_layer.registeruser(kvalidStreamer);
+  chirp::Timestamp start_time;
+  std::chrono::seconds seconds_since_start = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch());
+  std::chrono::microseconds useconds_since_start = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
+  start_time.set_seconds(seconds_since_start.count());
+  start_time.set_useconds(useconds_since_start.count());
+  service_layer.beginstream(kvalidHashtag, kvalidStreamer, start_time);
+  service_layer.chirp(kvalidChirper, kvalidChirpText1, "");
+  service_layer.endstream(kvalidHashtag, kvalidStreamer, start_time);
+  service_layer.chirp(kvalidChirper, kvalidChirpText2, "");
+  service_layer.beginstream(kvalidHashtag, kvalidStreamer, start_time);
+  std::deque<chirp::Chirp> chirp_results = service_layer.stream(kvalidHashtag, kvalidStreamer, start_time);
+  ASSERT_EQ(0, chirp_results.size());
 }
 
 int main(int argc, char **argv) {
